@@ -19,6 +19,11 @@ from tensorboardX import SummaryWriter
 
 
 
+# TODO: add components to state representation, such as: current hand
+# TODO: more complex reward structure (intermediate rewards for high-value cards, leading in VPs)
+# TODO: increase replay buffer to 5k-10k samples
+# TODO: normalize game state to be between 0 and 1
+
 # Hyperparameters
 GAMMA = 0.99  # Discount factor
 LR = 1e-3  # Learning rate
@@ -27,7 +32,7 @@ INPUT_SHAPE = 36
 N_ACTIONS = 18
 
 BATCH_SIZE = 64
-MEMORY_SIZE = 1000
+MEMORY_SIZE = 5000
 
 EPSILON_START = 1.0
 EPSILON_END = 0.1
