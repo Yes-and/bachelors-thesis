@@ -4,4 +4,4 @@ scipy
 scikit-learn
 tensorflow
 torch
-pyminion
+git+https://github.com/evanofslack/pyminion.git@master
