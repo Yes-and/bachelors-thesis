@@ -1,6 +1,4 @@
 from typing import Iterator
-import json
-import os
 import random
 
 import numpy as np
@@ -42,9 +40,29 @@ class MyBot(OptimizedBot):
         super().__init__(
             decider=MyBotDecider(
                 net, epsilon
-            ), 
+            ),
             player_id=player_id
             )
+        self.state_before_action = None
+        self.state_after_action = None
+
+    def take_turn(self, game: "Game", is_extra_turn: bool = False) -> None:
+        self.start_turn(game, is_extra_turn)
+        self.start_action_phase(game)
+        self.start_treasure_phase(game)
+        self.start_buy_phase(game)
+
+        # Save game states before/after action
+        self.state_before_action = self.decider.last_state
+        self.decider.set_current_state(
+            player=self,
+            game=game
+        )
+        self.state_after_action = self.decider.last_state
+        self.decider.last_state = None
+
+        self.start_cleanup_phase(game)
+        self.end_turn(game)
 
 class MyBotDecider(OptimizedBotDecider):
     def __init__(
@@ -55,6 +73,63 @@ class MyBotDecider(OptimizedBotDecider):
         super().__init__()
         self.net = net
         self.epsilon = epsilon
+        self.last_state = []
+        self.last_action = []
+        self.last_reward = []
+        self.state_indexes = {}
+        self.action_mapping = {
+            1: estate,
+            2: duchy,
+            3: province,
+            4: curse,
+            5: copper,
+            6: silver,
+            7: gold,
+            8: cellar,
+            9: moat,
+            10: merchant,
+            11: village,
+            12: workshop,
+            13: militia,
+            14: remodel,
+            15: smithy,
+            16: market,
+            17: mine,
+            18: None
+        }
+
+    def set_current_state(self, player: "Player", game: "Game"):
+        # Game state
+        pile_cards = {str(pile.name): len(pile) for pile in game.supply.piles}
+
+        # Player state
+        player_money = player.state.money
+        # player_buys = player.state.buys # TODO: Implement multi-buy functionality
+        discard_pile_size = len(player.discard_pile)
+        player_cards = {name: 0 for name in pile_cards.keys()}
+        for card in player.get_all_cards():
+            player_cards[str(card)] += 1
+
+        # Opponent state
+        i = [str(player) for player in game.players].index('big_money')
+        enemy_money = game.players[i].get_deck_money()
+        enemy_VPs = game.players[i].get_victory_points()
+
+        complete_state = list(pile_cards.values()) + \
+            [player_money, discard_pile_size] + \
+            list(player_cards.values()) + \
+            [enemy_money, enemy_VPs]
+        self.last_state = complete_state
+        
+        state_indexes = ['pile_' + val for val in list(pile_cards.keys())] + \
+            ['player_money', 'player_discard_size'] + \
+            ['player_' + val for val in list(player_cards.keys())] + \
+            ['enemy_money', 'enemy_VPs']
+        if not self.state_indexes:
+            self.state_indexes = state_indexes
+        else:
+            if not (self.state_indexes==state_indexes):
+                raise Exception('The order of cards in the state has changed!')
 
     def action_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
         """
@@ -88,74 +163,43 @@ class MyBotDecider(OptimizedBotDecider):
             else:
                 return iter([])
 
-    def play_step(self, state):
+    def buy_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
+        # Automatically set the game state as class variable
+        self.set_current_state(player=player, game=game)
+
+        # Basically a function for playing a step
         if np.random.random() < self.epsilon:
-            action = random.randint(1, 18)
+            action_indexes = []
+            for i in range(1, 18):
+                if self.action_mapping[i].base_cost.money <= player.state.money:
+                    action_indexes.append(i)
+            action = random.choice(action_indexes)
+
         else:
-            state_tensor = torch.tensor(state, dtype=torch.float32).unsqueeze(0)
+            state_tensor = torch.tensor(
+                self.last_state, 
+                dtype=torch.float32
+            ).unsqueeze(0)
             with torch.no_grad():
                 q_values = self.net(state_tensor)
+                # Action masking (removing unavailable buy options)
+                game_supply = {pile.name: len(pile) for pile in game.supply.piles}
+                for i in range(1, 18):
+                    if (
+                        self.action_mapping[i].base_cost.money > player.state.money
+                    ) or (
+                        game_supply[
+                            self.action_mapping[i].name
+                        ] == 0
+                    ):
+                        q_values[0][i-1] = float('-inf')
             action = torch.argmax(q_values).item() + 1
 
-        return action
+        # Save the action and return the card
+        self.last_action = action
+        card = self.action_mapping[action]
 
-    def buy_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
-        money = player.state.money
-        buys = player.state.buys
-
-        # Game state
-        pile_cards = {str(pile.name): len(pile) for pile in game.supply.piles}
-        
-        # Player state
-        player_cards = {name: 0 for name in pile_cards.keys()}
-        for card in player.get_all_cards():
-            player_cards[str(card)] += 1
-
-        complete_state = list(pile_cards.values()) + \
-            list(player_cards.values()) + \
-            [money] + [buys]
-        indexes = ['pile_' + val for val in list(pile_cards.keys())] + \
-            ['player_' + val for val in list(player_cards.keys())] + \
-            ['player_money', 'player_buys']
-        if os.environ.get('INDEXES'):
-            if not (json.loads(os.environ['INDEXES'])==indexes):
-                raise Exception('The index order has changed!')
-        else:
-            os.environ['INDEXES'] = json.dumps(indexes)
-        os.environ['STATE'] = json.dumps(complete_state)
-
-        action_code = self.play_step(state = complete_state)
-        os.environ['ACTION'] = str(action_code)
-
-        action_mapping = {
-            1: estate,
-            2: duchy,
-            3: province,
-            4: curse,
-            5: copper,
-            6: silver,
-            7: gold,
-            8: cellar,
-            9: moat,
-            10: merchant,
-            11: village,
-            12: workshop,
-            13: militia,
-            14: remodel,
-            15: smithy,
-            16: market,
-            17: mine,
-            18: None
-        }
-        card = action_mapping[action_code]
-        os.environ['REWARD'] = str(0.01)
         if not card:
             return iter([])
-        elif (money >= card.base_cost.money):
-            return iter(
-                [action_mapping[action_code]]
-            )
         else:
-            print('Illegal buy decision was made.')
-            os.environ['REWARD'] = str(-1.0)
-            return iter([])
+            return iter([card])
