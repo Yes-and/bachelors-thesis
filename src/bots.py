@@ -74,8 +74,8 @@ class MyBotDecider(OptimizedBotDecider):
         self.net = net
         self.epsilon = epsilon
         self.last_state = []
-        self.last_action = []
-        self.last_reward = []
+        self.last_action = None
+        self.last_reward = None
         self.state_indexes = {}
         self.action_mapping = {
             1: estate,
@@ -115,11 +115,26 @@ class MyBotDecider(OptimizedBotDecider):
         enemy_money = game.players[i].get_deck_money()
         enemy_VPs = game.players[i].get_victory_points()
 
+        # Totals for division (so that state values are normalized)
+        pile_cards_div = list(pile_cards.values())
+        player_money_div = [216] # 46*1 + 40*2 + 30*3
+        discard_pile_div = [250]
+        player_cards_div = pile_cards_div
+        enemy_money_div = player_money_div
+        enemy_VPs_div = [80]
+        divs = pile_cards_div + \
+            player_money_div + \
+            discard_pile_div + \
+            player_cards_div + \
+            enemy_money_div + \
+            enemy_VPs_div
+        
         complete_state = list(pile_cards.values()) + \
             [player_money, discard_pile_size] + \
             list(player_cards.values()) + \
             [enemy_money, enemy_VPs]
-        self.last_state = complete_state
+        normalized_state = np.array(complete_state) / np.array(divs)
+        self.last_state = normalized_state
         
         state_indexes = ['pile_' + val for val in list(pile_cards.keys())] + \
             ['player_money', 'player_discard_size'] + \
@@ -130,6 +145,30 @@ class MyBotDecider(OptimizedBotDecider):
         else:
             if not (self.state_indexes==state_indexes):
                 raise Exception('The order of cards in the state has changed!')
+
+    def set_turn_reward(self, player: "Player", game: "Game"):
+        
+        VP_delta = 0
+        deck_quality = 0
+        economic_growth = 0
+
+        # This tracks changes in Victory Points
+        card = self.action_mapping[self.last_action]
+        if card in [estate, duchy, province]:
+            VP_delta = np.tanh(card.score(player) / 5)
+        
+        # This tracks the proportion of low value cards in deck
+        player_cards = [card for card in player.get_all_cards()]
+        low_value_cards = [card for card in player_cards if card in [copper, estate, curse]]
+        deck_size = len(player_cards)
+        deck_quality = 1 - (len(low_value_cards) / deck_size)
+
+        # This tracks increase in purchasing power
+        if card in [copper, silver, gold, militia, market]:
+            economic_growth = np.tanh(card.money / 2)
+
+        total_reward = 0.4 * VP_delta + 0.3 * deck_quality + 0.3 * economic_growth
+        self.last_reward = total_reward
 
     def action_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
         """
@@ -177,7 +216,7 @@ class MyBotDecider(OptimizedBotDecider):
 
         else:
             state_tensor = torch.tensor(
-                self.last_state, 
+                self.last_state,
                 dtype=torch.float32
             ).unsqueeze(0)
             with torch.no_grad():
@@ -198,6 +237,9 @@ class MyBotDecider(OptimizedBotDecider):
         # Save the action and return the card
         self.last_action = action
         card = self.action_mapping[action]
+
+        # Set continuous reward
+        self.set_turn_reward(player, game)
 
         if not card:
             return iter([])
