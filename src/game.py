@@ -2,6 +2,8 @@ import json
 import logging
 import os
 
+import numpy as np
+
 from pyminion.core import Card
 from pyminion.game import Game
 from pyminion.player import Player
@@ -50,8 +52,8 @@ class CustomGame(Game):
                 if player.player_id == 'my_bot':
                     state = player.state_before_action
                     action = player.decider.last_action
-                    reward = 0
-                    done = 0
+                    reward = player.decider.last_reward
+                    done = False
                     new_state = player.state_after_action
 
                     self.last_state = new_state
@@ -67,14 +69,24 @@ class CustomGame(Game):
                 if self.is_over():
                     state = self.last_state
                     action = self.last_action
-                    # Get reward
+                    
+                    # Get final reward
+                    i = [str(player) for player in self.players].index('my_bot')
+                    my_bot = self.players[i]
+                    my_bot.decider.set_turn_reward(
+                        player=my_bot,
+                        game=self
+                    )
+                    reward = my_bot.decider.last_reward
+                    turns = my_bot.turns
                     winners = self.get_winners()
                     if ('my_bot' in [str(winner) for winner in winners]) \
                         and (len(winners)==1):
-                        reward = 1.0
+                        final_reward = reward + 1.5 * (1 / np.sqrt(turns))
                     else:
-                        reward = -1.0
-                    done = 1
+                        final_reward = reward + 1.5 * (-1 / np.sqrt(turns))
+                    done = True
+
                     # Get new state
                     i = [str(player) for player in self.players].index('my_bot')
                     self.players[i].decider.set_current_state(
@@ -87,7 +99,7 @@ class CustomGame(Game):
                     self.victory_points = self.players[i].get_victory_points()
 
                     current_experience = Experience(
-                        state, action, reward, done, new_state
+                        state, action, final_reward, done, new_state
                     )
                     self.exp_buffer.append(current_experience)
 
