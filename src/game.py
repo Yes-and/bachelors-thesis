@@ -30,8 +30,8 @@ class CustomGame(Game):
             expansions=expansions
         )
         self.exp_buffer = exp_buffer
-        self.total_rewards = []
-        self.victory_points = 0
+        self.player_VPs = 0
+        self.enemy_VPs = 0
         self.last_state = None
         self.last_action = None
         self.max_turns = 50
@@ -58,8 +58,6 @@ class CustomGame(Game):
 
                     self.last_state = new_state
                     self.last_action = action
-
-                    self.total_rewards.append(reward)
 
                     current_experience = Experience(
                         state, action, reward, done, new_state
@@ -95,8 +93,8 @@ class CustomGame(Game):
                     )
                     new_state = self.players[i].decider.last_state
 
-                    self.total_rewards.append(reward)
-                    self.victory_points = self.players[i].get_victory_points()
+                    self.player_VPs = self.players[i].get_victory_points()
+                    self.enemy_VPs = self.players[1-i].get_victory_points()
 
                     current_experience = Experience(
                         state, action, final_reward, done, new_state
