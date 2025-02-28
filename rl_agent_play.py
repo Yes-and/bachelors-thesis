@@ -105,7 +105,7 @@ def initialize_logger(timestamp):
 
 
 # Before starting training
-timestamp = datetime.datetime.now()
+timestamp = str(datetime.datetime.now())[:19].replace(":", "-")
 logger = initialize_logger(timestamp)
 epsilon = EPSILON_START
 game_counter = 1
