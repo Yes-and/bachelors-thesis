@@ -3,6 +3,7 @@ import logging
 
 from pyminion.bots.examples import BigMoney
 
+import numpy as np
 from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
@@ -30,9 +31,9 @@ N_ACTIONS = 18
 BATCH_SIZE = 64 # 32 - 128 Proposed by ChatGPT
 MEMORY_SIZE = 20000 # Training should stop at that point. Improvements should appear after 20k, ideal 100k
 
-EPSILON_START = 0.99 # Almost full exploration
+EPSILON_START = 1 # Full exploration in the beginning
 EPSILON_END = 0.05
-EPSILON_DECAY = 0.001
+EPSILON_DECAY = 0.002
 
 LOG_FREQUENCY = 50
 TARGET_UPDATE_FREQUENCY = 100 # Update target network every n games
@@ -53,6 +54,8 @@ target_net = DQN(
 )
 target_net.load_state_dict(policy_net.state_dict())
 target_net.eval()  # Target net is only updated periodically
+for param in target_net.parameters():
+    param.requires_grad = False
 
 optimizer = optim.Adam(policy_net.parameters(), lr=LR)
 loss_fn = nn.MSELoss()
@@ -88,6 +91,8 @@ def train_dqn():
 
     # Compute loss and optimize
     loss = loss_fn(q_values, target_q_values)
+    writer.add_scalar("loss_value", loss, game_counter)
+
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -120,7 +125,7 @@ while True:
     # Logging and saving
     if game_counter>0:
         writer.add_scalar("epsilon", epsilon, game_counter)
-        writer.add_scalar("buffer_size", len(exp_buffer))
+        writer.add_scalar("buffer_size", len(exp_buffer), game_counter)
     if game_counter % LOG_FREQUENCY == 0:
         logger.info(f"{game_counter} games have been played so far.")
     if game_counter % TARGET_UPDATE_FREQUENCY == 0:
@@ -153,7 +158,7 @@ while True:
 
     # Training
     train_dqn() # train DQN at the end of each game
-    epsilon = max(EPSILON_END, epsilon ** EPSILON_DECAY)
+    epsilon = EPSILON_END + (EPSILON_START - EPSILON_END) * np.exp(-EPSILON_DECAY * game_counter)
 
     if len(exp_buffer)>= MEMORY_SIZE:
         break
