@@ -100,7 +100,7 @@ class MyBotDecider(OptimizedBotDecider):
 
     def set_current_state(self, player: "Player", game: "Game"):
         # Game state
-        pile_cards = {str(pile.name): len(pile) for pile in game.supply.piles}
+        pile_cards = {str(pile.name): (len(pile) if pile in game.supply.piles else 0) for pile in game.supply.piles}
 
         # Player state
         player_money = player.state.money
@@ -116,7 +116,7 @@ class MyBotDecider(OptimizedBotDecider):
         enemy_VPs = game.players[i].get_victory_points()
 
         # Totals for division (so that state values are normalized)
-        pile_cards_div = list(pile_cards.values())
+        pile_cards_div = [8, 8, 8, 10, 46, 40, 30, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         player_money_div = [216] # 46*1 + 40*2 + 30*3
         discard_pile_div = [250]
         player_cards_div = pile_cards_div
@@ -134,8 +134,10 @@ class MyBotDecider(OptimizedBotDecider):
             list(player_cards.values()) + \
             [enemy_money, enemy_VPs]
         normalized_state = np.array(complete_state) / np.array(divs)
+        if not sum(normalized_state) > 0:
+            pass
         self.last_state = normalized_state
-        
+
         state_indexes = ['pile_' + val for val in list(pile_cards.keys())] + \
             ['player_money', 'player_discard_size'] + \
             ['player_' + val for val in list(player_cards.keys())] + \
