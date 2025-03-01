@@ -20,11 +20,13 @@ def load_replay_buffer_torch(filename="replay_buffer.pth", buffer_size=100000):
         return deque(maxlen=buffer_size)
 
 def sample_experience_batch(exp_buffer, batch_size):
+    exp_list = list(exp_buffer)
+
     indices = np.random.choice(
-        len(exp_buffer), batch_size, replace=False
+        len(exp_list), batch_size, replace=False
     )
     states, actions, rewards, dones, next_states = \
-        zip(*[exp_buffer[idx] for idx in indices])
+        zip(*[exp_list[idx] for idx in indices])
     return np.array(states), np.array(actions), \
             np.array(rewards, dtype=np.float32), \
             np.array(dones, dtype=np.uint8), \
