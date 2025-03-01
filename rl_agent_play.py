@@ -1,6 +1,7 @@
 import datetime
 import logging
 import multiprocessing
+import os
 import concurrent.futures
 
 from pyminion.bots.examples import BigMoney
@@ -46,45 +47,16 @@ SAVE_BUFFER_FREQUENCY = 5000
 SAVE_MODEL_FREQUENCY = 5000
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-
-# Initialize DQN networks and everything else needed to run successfully
-policy_net = DQN(
-    input_dim=INPUT_SHAPE,
-    output_dim=N_ACTIONS
-)
-target_net = DQN(
-    input_dim=INPUT_SHAPE,
-    output_dim=N_ACTIONS
-)
-target_net.load_state_dict(policy_net.state_dict())
-target_net.eval()  # Target net is only updated periodically
-for param in target_net.parameters():
-    param.requires_grad = False
-
-optimizer = optim.Adam(policy_net.parameters(), lr=LR)
-loss_fn = nn.MSELoss()
-
-# Initialize a multiprocessing manager
-manager = multiprocessing.Manager()
-shared_exp_buffer = manager.list() # Thread safe alternative to deque
-buffer_lock = multiprocessing.Lock() # Lock for buffer safety
-
-# Load initial replay buffer
-shared_exp_buffer.extend(
-    load_replay_buffer_torch(
-        filename='./replay_buffers/random_replay_buffer.pth'
-    )
-)
-
-writer = SummaryWriter() # Tensorboard logging
+MODEL_PATH = "./models/temp-policy-net.pth"  # Temp file for policy network
 
 
 
-# Function for training the DQN
-def train_dqn():
-    # Sample a mini-batch from experience replay
-    batch = sample_experience_batch(shared_exp_buffer, BATCH_SIZE)
+def train_dqn(policy_net, target_net, optimizer, loss_fn, shared_exp_buffer, writer, game_counter):
+    """Train the DQN using sampled experience replay."""
+    if len(shared_exp_buffer) < BATCH_SIZE:
+        return  # Skip training if insufficient experiences
+    
+    batch = sample_experience_batch(list(shared_exp_buffer), BATCH_SIZE)
     states, actions, rewards, dones, next_states = batch
 
     # Convert to PyTorch tensors
@@ -94,84 +66,99 @@ def train_dqn():
     dones = torch.tensor(dones, dtype=torch.float32, device=DEVICE).unsqueeze(1)
     next_states = torch.tensor(next_states, dtype=torch.float32, device=DEVICE)
 
-    # Compute Q-values for the actions taken: Q(s, a)
-    q_values = policy_net(states).gather(1, actions-1)
+    # Compute Q-values for the actions taken
+    q_values = policy_net(states).gather(1, actions - 1)
 
     # Compute target Q-values using the target network
     with torch.no_grad():
         next_q_values = target_net(next_states).max(1)[0].unsqueeze(1)
-        target_q_values = rewards + (GAMMA * next_q_values * (1 - dones))  # Bellman Equation
+        target_q_values = rewards + (GAMMA * next_q_values * (1 - dones))
 
     # Compute loss and optimize
     loss = loss_fn(q_values, target_q_values)
-    writer.add_scalar("loss_value", loss, game_counter)
+    writer.add_scalar("loss_value", loss.item(), game_counter)
 
-    logger.info("Fitting the DQN.")
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
-    logger.info("Fitting has finished.")
 
-# Function for setting up logging
-def initialize_logger(timestamp):
+
+
+def play_game(epsilon, writer, game_counter):
+    """Runs a game with a locally loaded policy network and returns a local experience buffer."""
+    local_exp_buffer = deque()
+
+    # Load policy net inside the subprocess
+    policy_net = DQN(INPUT_SHAPE, N_ACTIONS).to(DEVICE)
+    policy_net.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+    policy_net.eval()
+
+    bot1 = BigMoney()
+    bot2 = MyBot(net=policy_net, epsilon=epsilon)  # Use locally loaded network
+    game = CustomGame(players=[bot1, bot2], expansions=[custom_set], exp_buffer=local_exp_buffer)
+    game.play()  # Fills local_exp_buffer
+    player_VPs = game.player_VPs
+    enemy_VPs = game.enemy_VPs
+
+    writer.add_scalar("player_VPs", player_VPs, game_counter)
+    writer.add_scalar("enemy_VPs", enemy_VPs, game_counter)
+
+    return list(local_exp_buffer)
+
+
+
+if __name__ == "__main__":
+    multiprocessing.set_start_method("spawn", force=True)
+
+    # Initialize Logging
+    timestamp = str(datetime.datetime.now())[:19].replace(":", "-")
     logger = logging.getLogger('specific_logger')
     logger.setLevel(logging.INFO)
     file_handler = logging.FileHandler(f'./logs/run-{timestamp}.log')
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-    return logger
-
-# Function to run a game in parallel
-def play_game(policy_net, epsilon):
-    local_exp_buffer = deque()
-
-    bot1 = BigMoney()
-    bot2 = MyBot(net=policy_net, epsilon=epsilon)
-    game = CustomGame(
-        players=[bot1, bot2],
-        expansions=[custom_set],
-        exp_buffer=local_exp_buffer
-    )
-    result = game.play() # Fills local_exp_buffer
-    return list(local_exp_buffer)
-
-
-
-# Before starting training
-timestamp = str(datetime.datetime.now())[:19].replace(":", "-")
-logger = initialize_logger(timestamp)
-epsilon = EPSILON_START
-game_counter = 1
-player_VPs = []
-enemy_VPs = []
-
-
-if __name__ == "__main__":
-    multiprocessing.set_start_method("spawn", force=True)
 
     logger.info('Training DQN while playing against BigMoney')
 
-    # Main training loop
+    # Initialize Networks and Training Components
+    policy_net = DQN(INPUT_SHAPE, N_ACTIONS).to(DEVICE)
+    target_net = DQN(INPUT_SHAPE, N_ACTIONS).to(DEVICE)
+    target_net.load_state_dict(policy_net.state_dict())
+    target_net.eval()
+
+    optimizer = optim.Adam(policy_net.parameters(), lr=LR)
+    loss_fn = nn.MSELoss()
+    writer = SummaryWriter()
+
+    # Experience buffer
+    manager = multiprocessing.Manager()
+    shared_exp_buffer = manager.list()
+    buffer_lock = multiprocessing.Lock()
+
+    shared_exp_buffer.extend(
+        load_replay_buffer_torch('./replay_buffers/random_replay_buffer.pth')
+    )
+
+    epsilon = EPSILON_START
+    game_counter = 1
+
+    # Save initial policy net for subprocesses
+    torch.save(policy_net.state_dict(), MODEL_PATH)
+
+    # Training Loop
     with concurrent.futures.ProcessPoolExecutor(max_workers=NUM_GAMES_PARALLEL) as executor:
-        next_log = LOG_FREQUENCY
-        next_train = TRAIN_FREQUENCY
-        next_target_update = TARGET_UPDATE_FREQUENCY
-        next_save_buffer = SAVE_BUFFER_FREQUENCY
-        next_save_model = SAVE_MODEL_FREQUENCY
+        next_log, next_train, next_target_update = LOG_FREQUENCY, TRAIN_FREQUENCY, TARGET_UPDATE_FREQUENCY
+        next_save_buffer, next_save_model = SAVE_BUFFER_FREQUENCY, SAVE_MODEL_FREQUENCY
 
         while True:
             # Run multiple games in parallel
-            future_games = [executor.submit(play_game, policy_net, epsilon) for _ in range(NUM_GAMES_PARALLEL)]
+            future_games = [executor.submit(play_game, epsilon, writer, game_counter) for _ in range(NUM_GAMES_PARALLEL)]
 
             for future in concurrent.futures.as_completed(future_games):
                 new_experiences = future.result()
-
-                # Safely add experiences to shared buffer
                 with buffer_lock:
                     shared_exp_buffer.extend(new_experiences)
-
-                    # Maintain fixed buffer size
                     while len(shared_exp_buffer) > MEMORY_SIZE:
                         shared_exp_buffer.pop(0)
 
@@ -185,17 +172,18 @@ if __name__ == "__main__":
                 next_log += LOG_FREQUENCY
 
             if game_counter >= next_train:
-                train_dqn()
+                train_dqn(policy_net, target_net, optimizer, loss_fn, shared_exp_buffer, writer, game_counter)
                 next_train += TRAIN_FREQUENCY
 
             if game_counter >= next_target_update:
                 target_net.load_state_dict(policy_net.state_dict())
                 next_target_update += TARGET_UPDATE_FREQUENCY
+                torch.save(policy_net.state_dict(), MODEL_PATH)  # Update model for subprocesses
 
             if game_counter >= next_save_buffer:
                 save_replay_buffer_torch(shared_exp_buffer, f"./replay_buffers/buffer-{timestamp}.pth")
                 next_save_buffer += SAVE_BUFFER_FREQUENCY
-            
+
             if game_counter >= next_save_model:
                 torch.save(policy_net.state_dict(), f"./models/model-{timestamp}.pth")
                 next_save_model += SAVE_MODEL_FREQUENCY
@@ -203,17 +191,12 @@ if __name__ == "__main__":
             # Epsilon decay
             epsilon = EPSILON_END + (EPSILON_START - EPSILON_END) * np.exp(-EPSILON_DECAY * game_counter)
 
-            # Stopping condition
             if len(shared_exp_buffer) >= MEMORY_SIZE:
                 break
 
-# Save final model and buffer
-writer.close()
-torch.save(
-    policy_net.state_dict(),
-    f"./models/final-model-{timestamp}.pth"    
-)
-save_replay_buffer_torch(
-    shared_exp_buffer,
-    f"./replay_buffers/final-buffer-{timestamp}.pth"
-)
+    writer.close()
+    torch.save(policy_net.state_dict(), f"./models/final-model-{timestamp}.pth")
+    save_replay_buffer_torch(shared_exp_buffer, f"./replay_buffers/final-buffer-{timestamp}.pth")
+
+    # Cleanup temp model file
+    os.remove(MODEL_PATH)
