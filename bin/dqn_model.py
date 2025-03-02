@@ -12,11 +12,13 @@ class DQN(nn.Module):
         input_size = int(np.prod(input_shape))  # Flatten the input shape into a single dimension
 
         self.fc = nn.Sequential(
-            nn.Linear(input_size, 512),  # First hidden layer
+            nn.Linear(input_size, 256),  # First hidden layer
             nn.ReLU(),
-            nn.Linear(512, 256),  # Second hidden layer
+            nn.Linear(256, 128),  # Second hidden layer
             nn.ReLU(),
-            nn.Linear(256, n_actions)  # Output layer
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, n_actions)  # Output layer
         )
 
     def forward(self, x):
