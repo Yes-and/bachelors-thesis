@@ -36,15 +36,15 @@ BATCH_SIZE = 128 # Originally 64, this should make it smoother
 MEMORY_SIZE = 100000 # Training should stop at that point. Originally 50k
 
 EPSILON_START = 1 # Full exploration in the beginning
-EPSILON_END = 0.05
-EPSILON_DECAY = 0.0005 # Originally 0.002
+EPSILON_END = 0.1
+EPSILON_DECAY = 0.0005 # Originally 0.002, then 0.005
 
 LOG_FREQUENCY = 10
 NUM_GAMES_PARALLEL = 8
 TRAIN_FREQUENCY = 1 # Train network every n games
-TARGET_UPDATE_FREQUENCY = 30 # Originally 50
-SAVE_BUFFER_FREQUENCY = 100
-SAVE_MODEL_FREQUENCY = 100
+TARGET_UPDATE_FREQUENCY = 25 # Originally 50
+SAVE_BUFFER_FREQUENCY = 250
+SAVE_MODEL_FREQUENCY = 250
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MODEL_PATH = "./models/temp-policy-net.pth"  # Temp file for policy network
@@ -79,6 +79,7 @@ def train_dqn(policy_net, target_net, optimizer, loss_fn, shared_exp_buffer):
 
     optimizer.zero_grad()
     loss.backward()
+    torch.nn.utils.clip_grad_norm_(policy_net.parameters(), max_norm=10) # Add gradient clipping to prevent exploding Q-values
     optimizer.step()
 
     num_q_vals = q_values.detach().numpy()
