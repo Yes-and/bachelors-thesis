@@ -1,5 +1,8 @@
 import datetime
 import logging
+import multiprocessing
+import os
+import concurrent.futures
 
 from pyminion.bots.examples import BigMoney
 
@@ -8,6 +11,7 @@ from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
 import torch.optim as optim
+# from collections import deque
 
 from src.bots import MyBot
 from src.dqn_model import DQN
@@ -23,56 +27,37 @@ from src.tools import (
 
 # Hyperparameters
 GAMMA = 0.99 # Discount factor proposed by ChatGPT because Dominion has long-term rewards
-LR = 0.001 # Learning rate proposed by ChatGPT
+LR = 1e-4 # Originally 0.001
 
 INPUT_SHAPE = 38
 N_ACTIONS = 18
 
-BATCH_SIZE = 64 # 32 - 128 Proposed by ChatGPT
-MEMORY_SIZE = 20000 # Training should stop at that point. Improvements should appear after 20k, ideal 100k
+BATCH_SIZE = 128 # Originally 64, this should make it smoother
+MEMORY_SIZE = 100000 # Training should stop at that point. Originally 50k
 
 EPSILON_START = 1 # Full exploration in the beginning
-EPSILON_END = 0.05
-EPSILON_DECAY = 0.002
+EPSILON_END = 0.1
+EPSILON_DECAY = 0.0005 # Originally 0.002, then 0.005
 
-LOG_FREQUENCY = 50
-TARGET_UPDATE_FREQUENCY = 100 # Update target network every n games
-SAVE_BUFFER_FREQUENCY = 5000
-SAVE_MODEL_FREQUENCY = 5000
+LOG_FREQUENCY = 10
+NUM_GAMES_PARALLEL = 8
+TRAIN_FREQUENCY = 1 # Train network every n games
+TARGET_UPDATE_FREQUENCY = 25 # Originally 50
+SAVE_BUFFER_FREQUENCY = 250
+SAVE_MODEL_FREQUENCY = 250
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-
-# Initialize DQN networks and everything else needed to run successfully
-policy_net = DQN(
-    input_dim=INPUT_SHAPE,
-    output_dim=N_ACTIONS
-)
-target_net = DQN(
-    input_dim=INPUT_SHAPE,
-    output_dim=N_ACTIONS
-)
-target_net.load_state_dict(policy_net.state_dict())
-target_net.eval()  # Target net is only updated periodically
-for param in target_net.parameters():
-    param.requires_grad = False
-
-optimizer = optim.Adam(policy_net.parameters(), lr=LR)
-loss_fn = nn.MSELoss()
-
-exp_buffer = load_replay_buffer_torch(
-    filename='./replay_buffers/random_replay_buffer.pth'
-)
-
-writer = SummaryWriter() # Tensorboard logging
+MODEL_PATH = "./models/temp-policy-net.pth"  # Temp file for policy network
 
 
 
-# Function for training the DQN
-def train_dqn():
-    # Sample a mini-batch from experience replay
-    batch = sample_experience_batch(exp_buffer, BATCH_SIZE)
-    states, actions, rewards, dones, next_states = batch[0], batch[1], batch[2], batch[3], batch[4]
+def train_dqn(policy_net, target_net, optimizer, loss_fn, shared_exp_buffer):
+    """Train the DQN using sampled experience replay."""
+    if len(shared_exp_buffer) < BATCH_SIZE:
+        return  # Skip training if insufficient experiences
+    
+    batch = sample_experience_batch(list(shared_exp_buffer), BATCH_SIZE)
+    states, actions, rewards, dones, next_states = batch
 
     # Convert to PyTorch tensors
     states = torch.tensor(states, dtype=torch.float32, device=DEVICE)
@@ -81,94 +66,155 @@ def train_dqn():
     dones = torch.tensor(dones, dtype=torch.float32, device=DEVICE).unsqueeze(1)
     next_states = torch.tensor(next_states, dtype=torch.float32, device=DEVICE)
 
-    # Compute Q-values for the actions taken: Q(s, a)
-    q_values = policy_net(states).gather(1, actions-1)
+    # Compute Q-values for the actions taken
+    q_values = policy_net(states).gather(1, actions - 1)
 
     # Compute target Q-values using the target network
     with torch.no_grad():
         next_q_values = target_net(next_states).max(1)[0].unsqueeze(1)
-        target_q_values = rewards + (GAMMA * next_q_values * (1 - dones))  # Bellman Equation
+        target_q_values = rewards + (GAMMA * next_q_values * (1 - dones))
 
     # Compute loss and optimize
     loss = loss_fn(q_values, target_q_values)
-    writer.add_scalar("loss_value", loss, game_counter)
 
     optimizer.zero_grad()
     loss.backward()
+    torch.nn.utils.clip_grad_norm_(policy_net.parameters(), max_norm=10) # Add gradient clipping to prevent exploding Q-values
     optimizer.step()
 
-# Function for setting up logging
-def initialize_logger(timestamp):
+    num_q_vals = q_values.detach().numpy()
+    return loss, np.mean(num_q_vals), np.std(num_q_vals)
+
+
+
+def play_game(epsilon):
+    """Runs a game with a locally loaded policy network and returns a local experience buffer."""
+    local_exp_buffer = list()
+
+    # Load policy net inside the subprocess
+    policy_net = DQN(INPUT_SHAPE, N_ACTIONS).to(DEVICE)
+    policy_net.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+    policy_net.eval()
+
+    bot1 = BigMoney()
+    bot2 = MyBot(net=policy_net, epsilon=epsilon)  # Use locally loaded network
+    game = CustomGame(players=[bot1, bot2], expansions=[custom_set], exp_buffer=local_exp_buffer)
+    game.play()  # Fills local_exp_buffer
+    player_VPs = game.player_VPs
+    enemy_VPs = game.enemy_VPs
+
+    return list(game.exp_buffer), player_VPs, enemy_VPs
+
+
+
+if __name__ == "__main__":
+    multiprocessing.set_start_method("spawn", force=True)
+
+    # Initialize Logging
+    timestamp = str(datetime.datetime.now())[:19].replace(":", "-")
     logger = logging.getLogger('specific_logger')
     logger.setLevel(logging.INFO)
     file_handler = logging.FileHandler(f'./logs/run-{timestamp}.log')
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-    return logger
 
+    logger.info("Training DQN while playing against BigMoney")
 
+    # Initialize Networks and Training Components
+    policy_net = DQN(INPUT_SHAPE, N_ACTIONS).to(DEVICE)
+    target_net = DQN(INPUT_SHAPE, N_ACTIONS).to(DEVICE)
+    target_net.load_state_dict(policy_net.state_dict())
+    target_net.eval()
 
-# Before starting training
-timestamp = str(datetime.datetime.now())[:19].replace(":", "-")
-logger = initialize_logger(timestamp)
-epsilon = EPSILON_START
-game_counter = 1
-player_VPs = []
-enemy_VPs = []
+    optimizer = optim.Adam(policy_net.parameters(), lr=LR)
+    loss_fn = nn.MSELoss()
+    writer = SummaryWriter()
 
-
-
-logger.info('Training DQN while playing against BigMoney')
-# Main training loop
-while True:
-    # Logging and saving
-    if game_counter>0:
-        writer.add_scalar("epsilon", epsilon, game_counter)
-        writer.add_scalar("buffer_size", len(exp_buffer), game_counter)
-    if game_counter % LOG_FREQUENCY == 0:
-        logger.info(f"{game_counter} games have been played so far.")
-    if game_counter % TARGET_UPDATE_FREQUENCY == 0:
-        target_net.load_state_dict(policy_net.state_dict())
-    if game_counter % SAVE_BUFFER_FREQUENCY == 0:
-        save_replay_buffer_torch(
-            exp_buffer, 
-            f"./replay_buffers/buffer-{timestamp}.pth"
-        )
-    if game_counter % SAVE_MODEL_FREQUENCY == 0:
-        torch.save(
-            policy_net.state_dict(),
-            f"./models/model-{timestamp}.pth"
-        )
-
-    # Playing a game
-    bot1 = BigMoney()
-    bot2 = MyBot(net=policy_net, epsilon=epsilon)
-    game = CustomGame(
-        players=[bot1, bot2],
-        expansions=[custom_set],
-        exp_buffer=exp_buffer
+    # Experience buffer
+    exp_buffer = list()
+    exp_buffer.extend(
+        load_replay_buffer_torch('./replay_buffers/bigger_random_replay_buffer.pth')
     )
-    result = game.play()
-    game_counter += 1
+    logger.info(f"Initial replay buffer size: {len(exp_buffer)}")
 
-    if game_counter>0:
-        writer.add_scalar("player_victory_points", game.player_VPs, game_counter)
-        writer.add_scalar("enemy_victory_points", game.enemy_VPs, game_counter)
+    epsilon = EPSILON_START
+    game_counter = 1
 
-    # Training
-    train_dqn() # train DQN at the end of each game
-    epsilon = EPSILON_END + (EPSILON_START - EPSILON_END) * np.exp(-EPSILON_DECAY * game_counter)
+    # Save initial policy net for subprocesses
+    torch.save(policy_net.state_dict(), MODEL_PATH)
 
-    if len(exp_buffer)>= MEMORY_SIZE:
-        break
+    # Training Loop
+    with concurrent.futures.ProcessPoolExecutor(max_workers=NUM_GAMES_PARALLEL) as executor:
+        next_log, next_train, next_target_update = LOG_FREQUENCY, TRAIN_FREQUENCY, TARGET_UPDATE_FREQUENCY
+        next_save_buffer, next_save_model = SAVE_BUFFER_FREQUENCY, SAVE_MODEL_FREQUENCY
 
-writer.close()
-torch.save(
-    policy_net.state_dict(),
-    f"./models/final-model-{timestamp}.pth"    
-)
-save_replay_buffer_torch(
-    exp_buffer,
-    f"./replay_buffers/final-buffer-{timestamp}.pth"
-)
+        while True:
+            # Run multiple games in parallel
+            futures = [executor.submit(play_game, epsilon) for _ in range(NUM_GAMES_PARALLEL)]
+
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    new_experiences, player_VPs, enemy_VPs = future.result(timeout=10)
+                    if new_experiences:
+                        exp_buffer.extend(new_experiences)
+                    if player_VPs:
+                        writer.add_scalar("player_victory_points", player_VPs, game_counter)
+                    if enemy_VPs:
+                        writer.add_scalar("enemy_victory_points", enemy_VPs, game_counter)
+                    else:
+                        logger.info("Worker returned no experiences")
+                except concurrent.futures.TimeoutError:
+                    logger.info("Warning: a worker took too long! Terminating...")
+                except Exception as e:
+                    logger.info(f"Worker process failed: {e}")
+
+            game_counter += NUM_GAMES_PARALLEL
+
+            # Logging
+            if game_counter >= next_log:
+                logger.info(f"{game_counter} games played. Buffer size: {len(exp_buffer)}")
+                writer.add_scalar("epsilon", epsilon, game_counter)
+                writer.add_scalar("buffer_size", len(exp_buffer), game_counter)
+                next_log += LOG_FREQUENCY
+
+            if game_counter >= next_train:
+                logger.info("Fitting the DQN.")
+                loss, mean_q, std_q = train_dqn(policy_net, target_net, optimizer, loss_fn, exp_buffer)
+                logger.info("The DQN has been fitted.")
+                writer.add_scalar("loss", loss, game_counter)
+                writer.add_scalar("mean_q_values", mean_q, game_counter)
+                writer.add_scalar("std_q_values", std_q, game_counter)
+                next_train += TRAIN_FREQUENCY
+
+            if game_counter >= next_target_update:
+                logger.info("Updating target network.")
+                target_net.load_state_dict(policy_net.state_dict())
+                logger.info("Target network has been updated.")
+                next_target_update += TARGET_UPDATE_FREQUENCY
+                torch.save(policy_net.state_dict(), MODEL_PATH)  # Update model for subprocesses
+
+            if game_counter >= next_save_buffer:
+                logger.info("Saving replay buffer.")
+                save_replay_buffer_torch(exp_buffer, f"./replay_buffers/buffer-{timestamp}.pth")
+                logger.info("Replay buffer has been saved.")
+                next_save_buffer += SAVE_BUFFER_FREQUENCY
+
+            if game_counter >= next_save_model:
+                logger.info("Saving policy network model.")
+                torch.save(policy_net.state_dict(), f"./models/model-{timestamp}.pth")
+                logger.info("Policy network has been saved.")
+                next_save_model += SAVE_MODEL_FREQUENCY
+
+            # Epsilon decay
+            epsilon = EPSILON_END + (EPSILON_START - EPSILON_END) * np.exp(-EPSILON_DECAY * game_counter)
+
+            if len(exp_buffer) >= MEMORY_SIZE:
+                break
+
+    writer.close()
+    torch.save(policy_net.state_dict(), f"./models/final-model-{timestamp}.pth")
+    save_replay_buffer_torch(exp_buffer, f"./replay_buffers/final-buffer-{timestamp}.pth")
+
+    # Cleanup temp model file
+    os.remove(MODEL_PATH)

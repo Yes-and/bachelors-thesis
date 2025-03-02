@@ -9,7 +9,7 @@ from pyminion.game import Game
 from pyminion.player import Player
 from pyminion.result import GameResult
 
-from src.data_structures import Experience, ExperienceBuffer
+from src.data_structures import Experience
 
 
 
@@ -23,7 +23,7 @@ class CustomGame(Game):
         self,
         players: list[Player],
         expansions: list[list[Card]],
-        exp_buffer: ExperienceBuffer
+        exp_buffer: list[Experience]
     ):
         super().__init__(
             players=players,
