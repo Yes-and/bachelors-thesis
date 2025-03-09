@@ -1,15 +1,11 @@
-import json
 import logging
-import os
-
-import numpy as np
 
 from pyminion.core import Card
 from pyminion.game import Game
 from pyminion.player import Player
 from pyminion.result import GameResult
 
-from src.data_structures import Experience
+from src.data_structures import ExperienceMemory
 
 
 
@@ -23,7 +19,6 @@ class CustomGame(Game):
         self,
         players: list[Player],
         expansions: list[list[Card]],
-        exp_buffer: list[Experience],
         log_stdout: bool
     ):
         super().__init__(
@@ -31,11 +26,9 @@ class CustomGame(Game):
             expansions=expansions,
             log_stdout=log_stdout
         )
-        self.exp_buffer = exp_buffer
-        self.player_VPs = 0
-        self.enemy_VPs = 0
-        self.last_state = None
-        self.last_action = None
+        self.exp_buffer = ExperienceMemory()
+        self.player_vp = 0
+        self.enemy_vp = 0
         self.max_turns = 50
 
     def play(self) -> GameResult:
@@ -43,66 +36,61 @@ class CustomGame(Game):
         while True:
             for player in self.players:
                 self.current_player = player
-                self.play_turn(player)
 
-                if player.turns >= self.max_turns:
-                    self.is_over = True
+                # Stop the game if max turns is reached or if the game is over
+                if (player.turns >= self.max_turns):
+                    # Summarize the game for debugging
                     result = self.summarize_game()
-                    logging.info(f"Game was stopped after {self.max_turns} turns, \n{result}")
+                    logging.info(f"\n{result}")
+                    
+                    # Get reward
+                    i = [str(player) for player in self.players].index('my_bot')
+                    self.player_vp = self.players[i].get_victory_points()
+                    self.enemy_vp = self.players[1-i].get_victory_points()
+                    
+                    # We don't want the agent to play long games
+                    reward = -1
+
+                    # Save reward to last experience
+                    self.exp_buffer.rewards[-1] = reward
+
                     return result
+                    
+                
+                if (self.is_over()):
+                    # Summarize the game for debugging
+                    result = self.summarize_game()
+                    logging.info(f"\n{result}")
+
+                    # Get reward
+                    i = [str(player) for player in self.players].index('my_bot')
+                    self.player_vp = self.players[i].get_victory_points()
+                    self.enemy_vp = self.players[1-i].get_victory_points()
+
+                    if self.player_vp <= 0:
+                        reward = -1
+                    else:
+                        reward = (self.player_vp - self.enemy_vp) / (self.player_vp + self.enemy_vp) # Make sure enemy VPs are positive
+
+                    # Save reward to last experience
+                    self.exp_buffer.rewards[-1] = reward
+
+                    return result
+
+                self.play_turn(player)
 
                 if player.player_id == 'my_bot':
                     state = player.state_before_action
-                    action = player.decider.last_action
-                    reward = player.decider.last_reward
+                    action = player.decider.action
+                    log_prob = player.decider.log_prob
+                    reward = player.decider.reward
                     done = False
-                    new_state = player.state_after_action
 
-                    self.last_state = new_state
-                    self.last_action = action
-
-                    current_experience = Experience(
-                        state, action, reward, done, new_state
+                    # Save experiences to exp buffer
+                    self.exp_buffer.store(
+                        state=state,
+                        action=action,
+                        log_prob=log_prob,
+                        reward=reward,
+                        done=done
                     )
-                    self.exp_buffer.append(current_experience)
-
-                if self.is_over():
-                    state = self.last_state
-                    action = self.last_action
-                    
-                    # Get final reward
-                    i = [str(player) for player in self.players].index('my_bot')
-                    my_bot = self.players[i]
-                    my_bot.decider.set_turn_reward(
-                        player=my_bot,
-                        game=self
-                    )
-                    # reward = my_bot.decider.last_reward
-                    turns = my_bot.turns
-                    self.player_VPs = self.players[i].get_victory_points()
-                    self.enemy_VPs = self.players[1-i].get_victory_points()
-                    denominator = (self.player_VPs + self.enemy_VPs)
-                    if denominator == 0: # Prevent division by zero
-                        denominator = 1
-                    final_reward = (self.player_VPs - self.enemy_VPs - 0.5) / (denominator) / np.sqrt(turns)
-                    if turns >= self.max_turns: # Prevent the player not doing anything and still winning
-                        final_reward = -1
-                    done = True
-
-                    # Get new state
-                    i = [str(player) for player in self.players].index('my_bot')
-                    self.players[i].decider.set_current_state(
-                        player=self.players[i],
-                        game=self
-                    )
-                    new_state = self.players[i].decider.last_state
-
-
-                    current_experience = Experience(
-                        state, action, final_reward, done, new_state
-                    )
-                    self.exp_buffer.append(current_experience)
-
-                    result = self.summarize_game()
-                    logging.info(f"\n{result}")
-                    return result
