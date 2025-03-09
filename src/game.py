@@ -23,11 +23,13 @@ class CustomGame(Game):
         self,
         players: list[Player],
         expansions: list[list[Card]],
-        exp_buffer: list[Experience]
+        exp_buffer: list[Experience],
+        log_stdout: bool
     ):
         super().__init__(
             players=players,
-            expansions=expansions
+            expansions=expansions,
+            log_stdout=log_stdout
         )
         self.exp_buffer = exp_buffer
         self.player_VPs = 0
@@ -42,9 +44,9 @@ class CustomGame(Game):
             for player in self.players:
                 self.current_player = player
                 self.play_turn(player)
-                # TODO: add proper logging
 
                 if player.turns >= self.max_turns:
+                    self.is_over = True
                     result = self.summarize_game()
                     logging.info(f"Game was stopped after {self.max_turns} turns, \n{result}")
                     return result
@@ -75,14 +77,16 @@ class CustomGame(Game):
                         player=my_bot,
                         game=self
                     )
-                    reward = my_bot.decider.last_reward
+                    # reward = my_bot.decider.last_reward
                     turns = my_bot.turns
-                    winners = self.get_winners()
-                    if ('my_bot' in [str(winner) for winner in winners]) \
-                        and (len(winners)==1):
-                        final_reward = reward + 1.5 * (1 / np.sqrt(turns))
-                    else:
-                        final_reward = reward + 1.5 * (-1 / np.sqrt(turns))
+                    self.player_VPs = self.players[i].get_victory_points()
+                    self.enemy_VPs = self.players[1-i].get_victory_points()
+                    denominator = (self.player_VPs + self.enemy_VPs)
+                    if denominator == 0: # Prevent division by zero
+                        denominator = 1
+                    final_reward = (self.player_VPs - self.enemy_VPs - 0.5) / (denominator) / np.sqrt(turns)
+                    if turns >= self.max_turns: # Prevent the player not doing anything and still winning
+                        final_reward = -1
                     done = True
 
                     # Get new state
@@ -93,8 +97,6 @@ class CustomGame(Game):
                     )
                     new_state = self.players[i].decider.last_state
 
-                    self.player_VPs = self.players[i].get_victory_points()
-                    self.enemy_VPs = self.players[1-i].get_victory_points()
 
                     current_experience = Experience(
                         state, action, final_reward, done, new_state
