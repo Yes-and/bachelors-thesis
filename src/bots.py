@@ -111,7 +111,7 @@ class MyBotDecider(OptimizedBotDecider):
             player_cards[str(card)] += 1
 
         # Opponent state
-        i = [str(player) for player in game.players].index('big_money')
+        i = [str(player) for player in game.players].index('random_bot')
         enemy_money = game.players[i].get_deck_money()
         enemy_VPs = game.players[i].get_victory_points()
 
@@ -150,27 +150,30 @@ class MyBotDecider(OptimizedBotDecider):
 
     def set_turn_reward(self, player: "Player", game: "Game"):
         
-        VP_delta = 0
-        deck_quality = 0
-        economic_growth = 0
+        # VP_delta = 0
+        # deck_quality = 0
+        # economic_growth = 0
 
-        # This tracks changes in Victory Points
-        card = self.action_mapping[self.last_action]
-        if card in [estate, duchy, province]:
-            VP_delta = np.tanh(card.score(player) / 5)
+        # # This tracks changes in Victory Points
+        # card = self.action_mapping[self.last_action]
+        # if card in [estate, duchy, province]:
+        #     VP_delta = np.tanh(card.score(player) / 5)
         
-        # This tracks the proportion of low value cards in deck
-        player_cards = [card for card in player.get_all_cards()]
-        low_value_cards = [card for card in player_cards if card in [copper, estate, curse]]
-        deck_size = len(player_cards)
-        deck_quality = 1 - (len(low_value_cards) / deck_size)
+        # # This tracks the proportion of low value cards in deck
+        # player_cards = [card for card in player.get_all_cards()]
+        # low_value_cards = [card for card in player_cards if card in [copper, estate, curse]]
+        # deck_size = len(player_cards)
+        # deck_quality = 1 - (len(low_value_cards) / deck_size)
 
-        # This tracks increase in purchasing power
-        if card in [copper, silver, gold, militia, market]:
-            economic_growth = np.tanh(card.money / 2)
+        # # This tracks increase in purchasing power
+        # if card in [copper, silver, gold, militia, market]:
+        #     economic_growth = np.tanh(card.money / 2)
 
-        total_reward = 0.4 * VP_delta + 0.3 * deck_quality + 0.3 * economic_growth
-        self.last_reward = total_reward
+        # total_reward = 0.1 * VP_delta # 0.4 * VP_delta + 0.3 * deck_quality + 0.3 * economic_growth
+        # self.last_reward = total_reward
+
+        # We will backpropagate all future rewards
+        self.last_reward = 0
 
     def action_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
         """
@@ -247,3 +250,78 @@ class MyBotDecider(OptimizedBotDecider):
             return iter([])
         else:
             return iter([card])
+
+class RandomBot(OptimizedBot):
+    def __init__(
+        self,
+        player_id: str = "random_bot",
+    ):
+        super().__init__(decider=RandomBotDecider(), player_id=player_id)
+
+class RandomBotDecider(OptimizedBotDecider):
+    """
+    Does random things.
+    """
+    def __init__(
+        self
+    ):
+        super().__init__()
+        self.action_mapping = {
+            1: estate,
+            2: duchy,
+            3: province,
+            4: curse,
+            5: copper,
+            6: silver,
+            7: gold,
+            8: cellar,
+            9: moat,
+            10: merchant,
+            11: village,
+            12: workshop,
+            13: militia,
+            14: remodel,
+            15: smithy,
+            16: market,
+            17: mine
+        }
+
+    def action_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
+        """
+        The action priority is dictated by a simple heuristic:
+        1. Use cards that give actions
+        2. Use cards that give a large advantage
+        3. Use cards that give more cards
+        4. Use all other cards
+        """
+        while (player.state.actions > 0):
+            if village in player.hand.cards:
+                yield village
+            elif market in player.hand.cards:
+                yield market
+            elif merchant in player.hand.cards:
+                yield merchant
+            elif cellar in player.hand.cards:
+                yield cellar
+            elif mine in player.hand.cards:
+                yield mine
+            elif militia in player.hand.cards:
+                yield militia
+            elif smithy in player.hand.cards:
+                yield smithy
+            elif remodel in player.hand.cards:
+                yield remodel
+            elif workshop in player.hand.cards:
+                yield workshop
+            elif moat in player.hand.cards:
+                yield moat
+            else:
+                return iter([])
+
+    def buy_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
+        available_choices = [card for card in self.action_mapping.values() if card.base_cost.money < player.state.money]
+        chosen_card = random.choice(available_choices+[None])
+        if chosen_card is not None:
+            return iter([chosen_card])
+        else:
+            return iter([])
