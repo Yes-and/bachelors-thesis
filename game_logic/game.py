@@ -5,7 +5,7 @@ from pyminion.game import Game
 from pyminion.player import Player
 from pyminion.result import GameResult
 
-from src.data_structures import ExperienceMemory
+from game_logic.data_structures import GameExperienceMemory
 
 
 
@@ -26,9 +26,10 @@ class CustomGame(Game):
             expansions=expansions,
             log_stdout=log_stdout
         )
-        self.exp_buffer = ExperienceMemory()
+        self.exp_buffer = GameExperienceMemory()
         self.player_vp = 0
         self.enemy_vp = 0
+        self.player_turns = 0
         self.max_turns = 50
 
     def play(self) -> GameResult:
@@ -47,6 +48,7 @@ class CustomGame(Game):
                     i = [str(player) for player in self.players].index('my_bot')
                     self.player_vp = self.players[i].get_victory_points()
                     self.enemy_vp = self.players[1-i].get_victory_points()
+                    self.player_turns = self.players[i].turns
                     
                     # We don't want the agent to play long games
                     reward = -1
@@ -66,6 +68,7 @@ class CustomGame(Game):
                     i = [str(player) for player in self.players].index('my_bot')
                     self.player_vp = self.players[i].get_victory_points()
                     self.enemy_vp = self.players[1-i].get_victory_points()
+                    self.player_turns = self.players[i].turns
 
                     if self.player_vp <= 0:
                         reward = -1
