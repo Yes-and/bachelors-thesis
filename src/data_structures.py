@@ -1,6 +1,6 @@
 from multiprocessing import Manager
 
-class ExperienceMemory:
+class MultiprocessingExperienceMemory:
     def __init__(self):
         manager = Manager()
         self.states = manager.list()
@@ -8,14 +8,6 @@ class ExperienceMemory:
         self.log_probs = manager.list()
         self.rewards = manager.list()
         self.dones = manager.list()
-
-    def store(self, state, action, log_prob, reward, done):
-        """Store a single transition."""
-        self.states.append(state)
-        self.actions.append(action)
-        self.log_probs.append(log_prob)
-        self.rewards.append(reward)
-        self.dones.append(done)
 
     def store_batch(self, new_experiences):
         """Store an entire batch of experiences at once to reduce locking overhead."""
@@ -32,6 +24,16 @@ class ExperienceMemory:
         self.log_probs[:] = []
         self.rewards[:] = []
         self.dones[:] = []
+
+    def get_batch(self):
+        """Return normal lists before training."""
+        return (
+            list(self.states),
+            list(self.actions),
+            list(self.log_probs),
+            list(self.rewards),
+            list(self.dones)
+        )
 
     def __len__(self):
         return len(self.states)

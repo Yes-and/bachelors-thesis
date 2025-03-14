@@ -187,6 +187,7 @@ class MyBotDecider(OptimizedBotDecider):
                 # return iter([])
         return iter([])
 
+    @torch.no_grad()
     def buy_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
         # Automatically set the game state as class variable
         # self.set_current_state(player=player, game=game)
@@ -206,7 +207,7 @@ class MyBotDecider(OptimizedBotDecider):
                 valid_actions[i] = 0
 
         # Get valid action mask (1 for valid, 0 for invalid)
-        valid_action_mask = torch.tensor([valid_actions])
+        valid_action_mask = torch.tensor([valid_actions], device=action_logits.device)
 
         # Mask invalid actions by setting logits of invalid actions to a large negative number (-1e9)
         masked_logits = action_logits + (valid_action_mask - 1) * 1e9  # -1 * 1e9 → Very negative logits
@@ -217,7 +218,7 @@ class MyBotDecider(OptimizedBotDecider):
         # Sample action from the masked probability distribution
         action_dist = torch.distributions.Categorical(action_probs)
         action = action_dist.sample().item()
-        log_prob = action_dist.log_prob(torch.tensor(action))
+        log_prob = action_dist.log_prob(torch.tensor(action, device=action_logits.device))
 
         # Save important information
         self.action = action

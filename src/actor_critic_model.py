@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
 
-
-
 # Actor-Critic (Shared Network)
 class ActorCritic(nn.Module):
     def __init__(self, state_size, action_size):
