@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from pyminion.bots.examples import BigMoney
 
@@ -25,23 +26,25 @@ def play_game(g):
     )
     game.play()  # Fills game.exp_buffer
 
-    updated_exp_buffer = game.exp_buffer
+    exp = game.exp_buffer
 
-    # Variables for monte carlo returns
-    returns = []
-    cumulative_reward = 0
+    # Generalized advantage estimation
+    advantages = np.zeros(len(exp.rewards))  # Initialize advantage array
+    last_advantage = 0
 
-    # Propagate backward through the trajectory
-    for i in reversed(range(len(game.exp_buffer.rewards))):
-        cumulative_reward = game.exp_buffer.rewards[i] + g.GAMMA * cumulative_reward  # Apply discount factor
-        returns.insert(0, cumulative_reward)  # Store discounted return
+    for i in reversed(range(len(exp.rewards))):
+        # Compute TD error (delta)
+        delta = exp.rewards[i] + g.GAMMA * (exp.state_values[i + 1] if i < len(exp.rewards) - 1 else 0) - exp.state_values[i]
+        
+        # Compute GAE advantage
+        advantages[i] = last_advantage = delta + g.GAMMA * g.LAMBDA * last_advantage
 
-    # Replace reward with monte carlo returns
-    updated_exp_buffer.rewards = returns
+    # Normalize advantages and add them to the buffer
+    exp.advantages = advantages
 
     # Extract information regarding the number of victory points
     player_vp = game.player_vp
     enemy_vp = game.enemy_vp
     turns = game.player_turns
 
-    return updated_exp_buffer, player_vp, enemy_vp, turns
+    return exp, player_vp, enemy_vp, turns
