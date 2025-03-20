@@ -70,10 +70,7 @@ class CustomGame(Game):
                     self.enemy_vp = self.players[1-i].get_victory_points()
                     self.player_turns = self.players[i].turns
 
-                    if self.player_vp <= 0:
-                        reward = -1
-                    else:
-                        reward = (self.player_vp - self.enemy_vp) / (self.player_vp + self.enemy_vp) # Make sure enemy VPs are positive
+                    reward = 5 if (self.player_vp>self.enemy_vp) else -5
 
                     # Save reward to last experience
                     self.exp_buffer.rewards[-1] = reward
@@ -85,6 +82,7 @@ class CustomGame(Game):
                 if player.player_id == 'my_bot':
                     state = player.state_before_action
                     action = player.decider.action
+                    state_value = player.decider.state_value
                     log_prob = player.decider.log_prob
                     reward = player.decider.reward
                     done = False
@@ -93,6 +91,7 @@ class CustomGame(Game):
                     self.exp_buffer.store(
                         state=state,
                         action=action,
+                        state_value=state_value,
                         log_prob=log_prob,
                         reward=reward,
                         done=done

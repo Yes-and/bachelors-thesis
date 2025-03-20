@@ -118,10 +118,10 @@ class MyBotDecider(OptimizedBotDecider):
         pile_cards_div = [8, 8, 8, 10, 46, 40, 30, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         player_cards_div = pile_cards_div
 
-        player_money_div = [216] # 46*1 + 40*2 + 30*3
-        player_vp_div = [80]
-        enemy_money_div = player_money_div
-        enemy_vp_div = [80]
+        # player_money_div = [216] # 46*1 + 40*2 + 30*3
+        # player_vp_div = [80]
+        # enemy_money_div = player_money_div
+        # enemy_vp_div = [80]
 
         divs = pile_cards_div + \
             player_cards_div
@@ -221,18 +221,24 @@ class MyBotDecider(OptimizedBotDecider):
         self.action = action
         self.state_value = state_value.item()
         self.log_prob = log_prob.detach().numpy()
-        self.reward = 0
         self.done = 0
 
         # Set return card
         card = self.action_mapping[action+1]
 
-        # if card in [duchy, province]:
-        #     reward = card.score(player)
-        #     self.reward = reward
-        # elif card in [silver, gold]:
-        #     reward = card.money
-        #     self.reward = reward
+        # Custom reward shaping
+        reward = 0
+        if card in [province]:
+            reward = card.score(player)
+        elif card in [gold]:
+            reward = card.money
+        elif card in [silver]:
+            reward = 0.1
+        elif card in [copper]:
+            reward = -0.1
+        elif card in [curse]:
+            reward = -1
+        self.reward = reward
 
         if not card:
             return iter([])
