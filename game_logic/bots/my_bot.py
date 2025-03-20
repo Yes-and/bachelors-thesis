@@ -67,6 +67,7 @@ class MyBotDecider(OptimizedBotDecider):
         self.net = net
         self.state = None
         self.action = None
+        self.state_value = None
         self.reward = None
         self.log_prob = None
         self.done = None
@@ -100,36 +101,32 @@ class MyBotDecider(OptimizedBotDecider):
         pile_cards = {str(pile.name): (len(pile) if pile in game.supply.piles else 0) for pile in game.supply.piles}
 
         # Player state
-        player_money = player.state.money
-        # player_buys = player.state.buys # TODO: Implement multi-buy functionality
-        discard_pile_size = len(player.discard_pile)
         player_cards = {name: 0 for name in pile_cards.keys()}
         for card in player.get_all_cards():
             player_cards[str(card)] += 1
 
+        # Player state
+        # player_money = player.get_deck_money()
+        # player_vp = player.get_victory_points()
+
         # Opponent state
-        i = [str(player) for player in game.players].index('big_money')
-        enemy_money = game.players[i].get_deck_money()
-        enemy_VPs = game.players[i].get_victory_points()
+        # i = [str(player) for player in game.players].index('big_money')
+        # enemy_money = game.players[i].get_deck_money()
+        # enemy_vp = game.players[i].get_victory_points()
 
         # Totals for division (so that state values are normalized)
         pile_cards_div = [8, 8, 8, 10, 46, 40, 30, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
-        player_money_div = [216] # 46*1 + 40*2 + 30*3
-        discard_pile_div = [250]
         player_cards_div = pile_cards_div
+
+        player_money_div = [216] # 46*1 + 40*2 + 30*3
+        player_vp_div = [80]
         enemy_money_div = player_money_div
-        enemy_VPs_div = [80]
+        enemy_vp_div = [80]
+
         divs = pile_cards_div + \
-            player_money_div + \
-            discard_pile_div + \
-            player_cards_div + \
-            enemy_money_div + \
-            enemy_VPs_div
-        
+            player_cards_div
         complete_state = list(pile_cards.values()) + \
-            [player_money, discard_pile_size] + \
-            list(player_cards.values()) + \
-            [enemy_money, enemy_VPs]
+            list(player_cards.values())
         normalized_state = np.array(complete_state) / np.array(divs)
         if not sum(normalized_state) > 0:
             pass
@@ -222,12 +219,20 @@ class MyBotDecider(OptimizedBotDecider):
 
         # Save important information
         self.action = action
+        self.state_value = state_value.item()
         self.log_prob = log_prob.detach().numpy()
         self.reward = 0
         self.done = 0
 
         # Set return card
         card = self.action_mapping[action+1]
+
+        # if card in [duchy, province]:
+        #     reward = card.score(player)
+        #     self.reward = reward
+        # elif card in [silver, gold]:
+        #     reward = card.money
+        #     self.reward = reward
 
         if not card:
             return iter([])
