@@ -1,48 +1,72 @@
 import copy
 
 from src.actor_critic_model import ActorCritic
-from src.data_structures import ExperienceMemory
-from src.game import CustomGame
-from src.my_bot import MyBot
-from src.sets import custom_set
+from game_logic.game import CustomGame
+from game_logic.bots.my_bot import MyBot
+from game_logic.sets import custom_set
 
-from pyminion.bots.examples import BigMoney
 import numpy as np
+from pyminion.bots.examples import BigMoney
 import torch
 
 
 
-# Hyperparameters
-GAMMA = 0.95 # Discount factor proposed by ChatGPT because Dominion has long-term rewards
-LR = 1e-5 # Originally 0.001 (lower)
-STATE_SIZE = 38
-ACTION_SIZE = 18
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+class GlobalVariables:
+    # State representation
+    STATE_SIZE = 34
+    ACTION_SIZE = 18
 
-# Load policy net inside the subprocess
-policy_net = ActorCritic(STATE_SIZE, ACTION_SIZE).to(DEVICE)
-policy_net.eval()
+    # Hyperparameters
+    GAMMA = 0.99  # Discount factor
+    LAMBDA = 0.95 # Bias-variance tradeoff factor
+    LR = 1e-5  # Learning rate
+    EPSILON_CLIP = 0.2  # PPO Clipping range
+    EPOCHS = 10  # Number of tratates, actions, loning epochs per batch
+    BATCH_SIZE = 64  # Mini-batch size for training
+    EPISODES = 5000  # Training episodes
 
+    # Others
+    NUM_GAMES_PARALLEL = 4
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    MODEL_PATH = "./models/temp-policy-net.pth"
+
+    # Logging
+    SAVE_MODEL_FREQUENCY = 200
+    LOG_FREQUENCY = 100
+
+g = GlobalVariables()
+
+policy_net = ActorCritic(g.STATE_SIZE, g.ACTION_SIZE).to(g.DEVICE)
+# policy_net.load_state_dict(torch.load(g.MODEL_PATH, map_location=g.DEVICE)) # Load the network
+policy_net.eval() # Sets network to evaluation mode
+
+# Set up the game
 bot1 = BigMoney()
 bot2 = MyBot(net=policy_net)
 game = CustomGame(
     players=[bot1, bot2],
     expansions=[custom_set],
-    log_stdout=True,
+    log_stdout=False,
 )
-game.play()  # Fills local_exp_buffer
+game.play()  # Fills game.exp_buffer
 
-updated_exp_buffer = game.exp_buffer
+exp = game.exp_buffer
 
-returns = []
-G = 0
+# Generalized advantage estimation
+advantages = np.zeros(len(exp.rewards))  # Initialize advantage array
+last_advantage = 0
 
-# Propagate backward through the trajectory
-for i in reversed(range(len(game.exp_buffer.rewards))):
-    G = game.exp_buffer.rewards[i] + GAMMA * G  # Apply discount factor
-    returns.insert(0, G)  # Store discounted return
+for i in reversed(range(len(exp.rewards))):
+    # Compute TD error (delta)
+    delta = exp.rewards[i] + g.GAMMA * (exp.state_values[i + 1] if i < len(exp.rewards) - 1 else 0) - exp.state_values[i]
+    
+    # Compute GAE advantage
+    advantages[i] = last_advantage = delta + g.GAMMA * g.LAMBDA * last_advantage
 
-updated_exp_buffer.rewards = returns
+# Normalize advantages and add them to the buffer
+exp.advantages = advantages
 
-player_VPs = game.player_vp
-enemy_VPs = game.enemy_vp
+# Extract information regarding the number of victory points
+player_vp = game.player_vp
+enemy_vp = game.enemy_vp
+turns = game.player_turns
