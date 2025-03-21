@@ -69,7 +69,6 @@ class CustomGame(Game):
                     self.player_vp = self.players[i].get_victory_points()
                     self.enemy_vp = self.players[1-i].get_victory_points()
                     self.player_turns = self.players[i].turns
-
                     reward = 5 if (self.player_vp>self.enemy_vp) else -5
 
                     # Save reward to last experience
