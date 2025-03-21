@@ -6,26 +6,30 @@ import shutil
 
 from src.data_structures import MultiprocessingExperienceMemory
 from src.logger import setup_logger
+from src.actor_critic_model import ActorCritic
 
 from training.simulate_game import play_game
 from training.train_network import train_policy
 
 from tensorboardX import SummaryWriter
 import torch
+import torch.optim as optim
 
 
 
 class GlobalVariables:
     # State representation
-    STATE_SIZE = 38
+    STATE_SIZE = 34
     ACTION_SIZE = 18
 
     # Hyperparameters
     GAMMA = 0.99  # Discount factor
+    LAMBDA = 0.95 # Bias-variance tradeoff factor
     LR = 1e-5  # Learning rate
     EPSILON_CLIP = 0.2  # PPO Clipping range
-    EPOCHS = 5  # Number of tratates, actions, loning epochs per batch
-    BATCH_SIZE = 32  # Mini-batch size for training
+    EPOCHS = 10 # Number of tratates, actions, loning epochs per batch
+    N_GAMES_TRAINING = 100  # N games for training
+    BATCH_SIZE = 64 # Mini-batches for more efficient learning
     EPISODES = 5000  # Training episodes
 
     # Others
@@ -34,7 +38,7 @@ class GlobalVariables:
     MODEL_PATH = "./models/temp-policy-net.pth"
 
     # Logging
-    SAVE_MODEL_FREQUENCY = 200
+    SAVE_MODEL_FREQUENCY = 1000
     LOG_FREQUENCY = 100
 
 
@@ -42,6 +46,16 @@ class GlobalVariables:
 if __name__ == "__main__":
     g = GlobalVariables()
     multiprocessing.set_start_method("spawn", force=True)
+
+    # Delete the old model
+    if os.path.exists(g.MODEL_PATH):
+        os.remove(g.MODEL_PATH)
+        print(f"Deleted existing file: {g.MODEL_PATH}")
+    
+    # Create random model, save it and delete from memory
+    policy_net = ActorCritic(g.STATE_SIZE, g.ACTION_SIZE).to(g.DEVICE)
+    torch.save(policy_net.state_dict(), g.MODEL_PATH)
+    optimizer = optim.Adam(policy_net.parameters(), lr=g.LR)
 
     # Initialize Logging
     logger, log_queue = setup_logger()
@@ -53,7 +67,7 @@ if __name__ == "__main__":
     logger.info(f"LR: {g.LR}")
     logger.info(f"EPSILON CLIP: {g.EPSILON_CLIP}")
     logger.info(f"EPOCHS: {g.EPOCHS}")
-    logger.info(f"BATCH SIZE: {g.BATCH_SIZE}")
+    logger.info(f"BATCH SIZE: {g.N_GAMES_TRAINING}")
     logger.info(f"NUM GAMES PARALLEL: {g.NUM_GAMES_PARALLEL}")
 
     # Shared experience memory optimized for multiprocessing
@@ -62,7 +76,7 @@ if __name__ == "__main__":
 
     # Parallel Execution
     with concurrent.futures.ProcessPoolExecutor(max_workers=g.NUM_GAMES_PARALLEL) as executor:
-        next_log, next_train, next_save_model = g.LOG_FREQUENCY, g.BATCH_SIZE, g.SAVE_MODEL_FREQUENCY
+        next_log, next_train, next_save_model = g.LOG_FREQUENCY, g.N_GAMES_TRAINING, g.SAVE_MODEL_FREQUENCY
 
         while True:
             # Start multiple games in parallel
@@ -97,12 +111,24 @@ if __name__ == "__main__":
             if game_counter >= next_train:
                 logger.info(f"Collected {len(safe_exp_buffer)} experiences. Training now...")
                 batch = safe_exp_buffer.get_batch()
-                states, actions, log_probs, rewards, dones = batch
-                loss = train_policy(g, states, actions, log_probs, rewards)
+                states, actions, rewards, log_probs, advantages, state_values, dones = batch
+                loss, entropy, actor_loss, critic_loss = train_policy(
+                    g=g,
+                    policy_net=policy_net,
+                    optimizer=optimizer,
+                    states=states,
+                    actions=actions,
+                    log_probs=log_probs,
+                    advantages=advantages,
+                    state_values=state_values
+                )
                 writer.add_scalar("loss", loss, game_counter)
+                writer.add_scalar("entropy", entropy, game_counter)
+                writer.add_scalar("loss_actor", actor_loss, game_counter)
+                writer.add_scalar("loss_critic", critic_loss, game_counter)
                 logger.info("Policy network has been fitted. Clearing the buffer...")
                 safe_exp_buffer.clear()
-                next_train += g.BATCH_SIZE
+                next_train += g.N_GAMES_TRAINING
 
             # Save model periodically
             if game_counter >= next_save_model:
