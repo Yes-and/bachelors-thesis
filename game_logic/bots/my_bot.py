@@ -1,3 +1,4 @@
+import random
 from typing import Iterator
 
 import numpy as np
@@ -33,16 +34,17 @@ class MyBot(OptimizedBot):
     def __init__(
         self,
         net,
+        prob_action,
+        memory,
         player_id: str = "my_bot"
     ):
         super().__init__(
-            decider=MyBotDecider(
-                net
-            ),
+            decider=MyBotDecider(),
             player_id=player_id
             )
-        self.state_before_action = None
-        self.state_after_action = None
+        self.net = net
+        self.prob_action = prob_action
+        self.memory = memory
 
     def take_turn(self, game: "Game", is_extra_turn: bool = False) -> None:
         self.start_turn(game, is_extra_turn)
@@ -51,26 +53,25 @@ class MyBot(OptimizedBot):
         
         # Save game states before action
         self.decider.set_current_state(self, game)
-        self.state_before_action = self.decider.state
         self.start_buy_phase(game)
         self.decider.reset_state() # Reset the state for debugging
 
         self.start_cleanup_phase(game)
         self.end_turn(game)
 
+    def get_good_cards_ratio(self, game: "Game") -> float:
+        all_cards = [card for card in self.get_all_cards()]
+        non_trash_cards = [card for card in all_cards if card not in [curse, copper, estate]]
+        return len(non_trash_cards) / len(all_cards)
+
 class MyBotDecider(OptimizedBotDecider):
     def __init__(
-        self,
-        net
+        self
     ):
         super().__init__()
-        self.net = net
         self.state = None
         self.action = None
-        self.state_value = None
-        self.reward = None
-        self.log_prob = None
-        self.done = None
+        self.turn = None
         self.state_indexes = {}
         self.action_mapping = {
             1: estate,
@@ -105,31 +106,15 @@ class MyBotDecider(OptimizedBotDecider):
         for card in player.get_all_cards():
             player_cards[str(card)] += 1
 
-        # Player state
-        # player_money = player.get_deck_money()
-        # player_vp = player.get_victory_points()
-
-        # Opponent state
-        # i = [str(player) for player in game.players].index('big_money')
-        # enemy_money = game.players[i].get_deck_money()
-        # enemy_vp = game.players[i].get_victory_points()
-
         # Totals for division (so that state values are normalized)
         pile_cards_div = [8, 8, 8, 10, 46, 40, 30, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         player_cards_div = pile_cards_div
-
-        # player_money_div = [216] # 46*1 + 40*2 + 30*3
-        # player_vp_div = [80]
-        # enemy_money_div = player_money_div
-        # enemy_vp_div = [80]
 
         divs = pile_cards_div + \
             player_cards_div
         complete_state = list(pile_cards.values()) + \
             list(player_cards.values())
         normalized_state = np.array(complete_state) / np.array(divs)
-        if not sum(normalized_state) > 0:
-            pass
         self.state = normalized_state
 
         state_indexes = ['pile_' + val for val in list(pile_cards.keys())] + \
@@ -159,86 +144,64 @@ class MyBotDecider(OptimizedBotDecider):
         # 3. Use cards that give more cards
         # 4. Use all other cards
         # """
-        # while (player.state.actions > 0):
-        #     if village in player.hand.cards:
-        #         yield village
-        #     elif market in player.hand.cards:
-        #         yield market
-        #     elif merchant in player.hand.cards:
-        #         yield merchant
-        #     elif cellar in player.hand.cards:
-        #         yield cellar
-        #     elif mine in player.hand.cards:
-        #         yield mine
-        #     elif militia in player.hand.cards:
-        #         yield militia
-        #     elif smithy in player.hand.cards:
-        #         yield smithy
-        #     elif remodel in player.hand.cards:
-        #         yield remodel
-        #     elif workshop in player.hand.cards:
-        #         yield workshop
-        #     elif moat in player.hand.cards:
-        #         yield moat
-        #     else:
-                # return iter([])
-        return iter([])
+        while (player.state.actions > 0):
+            if village in player.hand.cards:
+                yield village
+            elif market in player.hand.cards:
+                yield market
+            elif merchant in player.hand.cards:
+                yield merchant
+            elif cellar in player.hand.cards:
+                yield cellar
+            elif mine in player.hand.cards:
+                yield mine
+            elif militia in player.hand.cards:
+                yield militia
+            elif smithy in player.hand.cards:
+                yield smithy
+            elif remodel in player.hand.cards:
+                yield remodel
+            elif workshop in player.hand.cards:
+                yield workshop
+            elif moat in player.hand.cards:
+                yield moat
+            else:
+                return iter([])
 
     @torch.no_grad()
     def buy_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
-        # Automatically set the game state as class variable
-        # self.set_current_state(player=player, game=game)
-        state_tensor = torch.tensor(
-            self.state,
-            dtype=torch.float32
-        ).unsqueeze(0)
-
-        # Get logits (before softmax) and state value from policy network
-        action_logits, state_value = self.net(state_tensor)  # Logits, not probabilities
-
-        # Get valid actions
+        # Filter valid actions
         valid_actions = [1] * 18
         cards = list(self.action_mapping.values())[:17]
         for i in range(17):
             if cards[i].base_cost.money > player.state.money:
                 valid_actions[i] = 0
 
-        # Get valid action mask (1 for valid, 0 for invalid)
-        valid_action_mask = torch.tensor([valid_actions], device=action_logits.device)
+        if (not self.turn) and (random.random() < player.prob_action):
+            valid_actions = [i for i in range(17) if valid_actions[i]==1] # Convert to a numerical list
+            self.action = random.choice(valid_actions)
+            self.turn = player.turns
 
-        # Mask invalid actions by setting logits of invalid actions to a large negative number (-1e9)
-        masked_logits = action_logits + (valid_action_mask - 1) * 1e9  # -1 * 1e9 → Very negative logits
+            # Save important variables
+            player.memory.state = self.state
+            player.memory.action = self.action
+            player.memory.turn = self.turn
+        else:
+            # Get the game state
+            state_tensor = torch.tensor(
+                self.state,
+                dtype=torch.float32
+            ).unsqueeze(0)
 
-        # Apply softmax to get final probability distribution
-        action_probs = torch.nn.functional.softmax(masked_logits, dim=-1)
+            # Get valid action mask (1 for valid, 0 for invalid)
+            valid_action_mask = torch.tensor([valid_actions])
 
-        # Sample action from the masked probability distribution
-        action_dist = torch.distributions.Categorical(action_probs)
-        action = action_dist.sample().item()
-        log_prob = action_dist.log_prob(torch.tensor(action, device=action_logits.device))
-
-        # Save important information
-        self.action = action
-        self.state_value = state_value.item()
-        self.log_prob = log_prob.detach().numpy()
-        self.done = 0
+            action, log_prob, probs = player.net.get_action(state_tensor, valid_action_mask)
+            
+            self.action = action
 
         # Set return card
-        card = self.action_mapping[action+1]
-
-        # Custom reward shaping
-        reward = 0
-        if card in [province]:
-            reward = card.score(player)
-        elif card in [gold]:
-            reward = card.money
-        elif card in [silver]:
-            reward = 0.1
-        elif card in [copper]:
-            reward = -0.1
-        elif card in [curse]:
-            reward = -1
-        self.reward = reward
+        card = self.action_mapping[self.action+1]
 
         if not card:
             return iter([])
