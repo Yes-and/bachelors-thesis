@@ -25,7 +25,7 @@ class GlobalVariables:
     # Hyperparameters
     LR = 1e-3  # Learning rate
     N_GAMES_TRAINING = 128 # Mini-batches for more efficient learning
-    EPISODES = 30000  # Training episodes
+    EPISODES = 100000  # Training episodes
 
     # Others
     NUM_GAMES_PARALLEL = 4
