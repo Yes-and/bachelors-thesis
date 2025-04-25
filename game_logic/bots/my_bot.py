@@ -48,7 +48,12 @@ class MyBot(OptimizedBot):
 
     def take_turn(self, game: "Game", is_extra_turn: bool = False) -> None:
         self.start_turn(game, is_extra_turn)
-        self.start_action_phase(game)
+
+        try:
+            self.start_action_phase(game)
+        except Exception as e:
+            print(e)
+
         self.start_treasure_phase(game)
         
         # Save game states before action
@@ -153,16 +158,16 @@ class MyBotDecider(OptimizedBotDecider):
                 yield merchant
             elif cellar in player.hand.cards:
                 yield cellar
-            elif mine in player.hand.cards:
-                yield mine
+            # elif mine in player.hand.cards:
+            #     yield mine
             elif militia in player.hand.cards:
                 yield militia
             elif smithy in player.hand.cards:
                 yield smithy
-            elif remodel in player.hand.cards:
-                yield remodel
-            elif workshop in player.hand.cards:
-                yield workshop
+            # elif remodel in player.hand.cards:
+            #     yield remodel
+            # elif workshop in player.hand.cards:
+            #     yield workshop
             elif moat in player.hand.cards:
                 yield moat
             else:
@@ -175,6 +180,8 @@ class MyBotDecider(OptimizedBotDecider):
         cards = list(self.action_mapping.values())[:17]
         for i in range(17):
             if cards[i].base_cost.money > player.state.money:
+                valid_actions[i] = 0
+            elif len(game.supply.piles[i].cards)==0:
                 valid_actions[i] = 0
 
         if (not self.turn) and (random.random() < player.prob_action):
