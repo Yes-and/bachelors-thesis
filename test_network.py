@@ -8,6 +8,7 @@ from game_logic.sets import custom_set
 
 import numpy as np
 from pyminion.bots.examples import BigMoney
+from pyminion.simulator import Simulator
 import torch
 
 
@@ -18,7 +19,7 @@ class GlobalVariables:
     ACTION_SIZE = 18
 
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    MODEL_PATH = "./models/model-2025-03-22 20-11-50.pth"
+    MODEL_PATH = "./models/model-2025-04-20 15-20-16.pth"
 
 g = GlobalVariables()
 
@@ -30,18 +31,13 @@ memory = GameExperienceMemory()
 
 # Set up the game
 bot1 = BigMoney()
-bot2 = MyBot(net=policy_net, prob_action=1/25, memory=memory)
+bot2 = MyBot(net=policy_net, prob_action=0, memory=memory)
 game = CustomGame(
     players=[bot1, bot2],
     expansions=[custom_set],
-    log_stdout=True,
+    log_stdout=False,
     memory=memory
 )
-game.play()  # Fills game.exp_buffer
-
-if memory.action is None:
-    memory.action = 18
-    memory.turn = 1
-    memory.state = np.array( # Starting state
-        [1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.375,0.,0.,0.,0.15217391,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.]
-    )
+sim = Simulator(game, iterations=100)
+result = sim.run()
+print(result)
