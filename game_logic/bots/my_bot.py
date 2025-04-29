@@ -49,11 +49,7 @@ class MyBot(OptimizedBot):
     def take_turn(self, game: "Game", is_extra_turn: bool = False) -> None:
         self.start_turn(game, is_extra_turn)
 
-        try:
-            self.start_action_phase(game)
-        except Exception as e:
-            print(e)
-
+        self.start_action_phase(game)
         self.start_treasure_phase(game)
         
         # Save game states before action
@@ -150,24 +146,59 @@ class MyBotDecider(OptimizedBotDecider):
         # 4. Use all other cards
         # """
         while (player.state.actions > 0):
-            if village in player.hand.cards:
+            available_cards = [
+                pile.cards[0] for pile in game.supply.piles if len(pile.cards)>0
+            ]
+            if (village in player.hand.cards):
                 yield village
-            elif market in player.hand.cards:
+            elif (market in player.hand.cards):
                 yield market
-            elif merchant in player.hand.cards:
+            elif (merchant in player.hand.cards):
                 yield merchant
-            elif cellar in player.hand.cards:
+            elif (cellar in player.hand.cards) and (
+                (
+                    estate in player.hand.cards
+                ) or (
+                    duchy in player.hand.cards
+                ) or (
+                    province in player.hand.cards
+                ) or (
+                    curse in player.hand.cards
+                )
+            ): # The bot will discard victory cards
                 yield cellar
-            # elif mine in player.hand.cards:
-            #     yield mine
-            elif militia in player.hand.cards:
+            elif (mine in player.hand.cards) and (
+                (
+                    (
+                        copper in player.hand.cards
+                    ) and (
+                        silver in available_cards
+                    )
+                ) or (
+                    (
+                        silver in player.hand.cards
+                    ) and (
+                        gold in available_cards
+                    )
+                )
+            ): # The bot will upgrade coppers to silvers and silvers to golds
+                yield mine
+            elif (militia in player.hand.cards):
                 yield militia
-            elif smithy in player.hand.cards:
+            elif (smithy in player.hand.cards):
                 yield smithy
-            # elif remodel in player.hand.cards:
+            # elif remodel in player.hand.cards: # Too complex, not used
             #     yield remodel
-            # elif workshop in player.hand.cards:
-            #     yield workshop
+            elif (workshop in player.hand.cards) and (
+                (
+                    smithy in available_cards
+                ) or (
+                    village in available_cards
+                ) or (
+                    silver in available_cards
+                )
+            ): # Only get valuable cards, i.e. smithies, villages or silvers
+                yield workshop
             elif moat in player.hand.cards:
                 yield moat
             else:

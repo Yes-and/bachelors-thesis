@@ -19,7 +19,7 @@ class GlobalVariables:
     ACTION_SIZE = 18
 
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    MODEL_PATH = "./models/model-2025-04-20 15-20-16.pth"
+    MODEL_PATH = "./models/the_best_model_so_far.pth"
 
 g = GlobalVariables()
 

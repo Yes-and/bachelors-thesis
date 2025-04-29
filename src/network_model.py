@@ -9,14 +9,16 @@ class PolicyNetwork(nn.Module):
         super(PolicyNetwork, self).__init__()
         self.fc1 = nn.Linear(state_size, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, action_size)
+        # self.fc3 = nn.Linear(hidden_dim, action_size)
 
         # Bias toward 'do_nothing' (assume index 0)
-        with torch.no_grad():
-            self.fc2.bias.fill_(-5.0)   # Low score for all actions
-            self.fc2.bias[-1] = 5.0      # High score for 'do_nothing'
+        # with torch.no_grad():
+        #     self.fc2.bias.fill_(-5.0)   # Low score for all actions
+        #     self.fc2.bias[-1] = 5.0      # High score for 'do_nothing'
 
     def forward(self, state):
         x = F.relu(self.fc1(state))
+        # x = F.relu(self.fc2(x))
         logits = self.fc2(x)  # Shape: [batch_size, num_actions]
         return logits
 
