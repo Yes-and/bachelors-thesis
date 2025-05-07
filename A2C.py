@@ -47,7 +47,7 @@ if __name__ == "__main__":
         os.remove(g.MODEL_PATH)
         print(f"Deleted existing file: {g.MODEL_PATH}")
     
-    # Create random model, save it and delete from memory
+    # Create random model and save it
     shared_net = A2C(g.STATE_SIZE, g.ACTION_SIZE).to(g.DEVICE)
     torch.save(shared_net.state_dict(), g.MODEL_PATH)
     optimizer = optim.Adam(shared_net.parameters(), lr=g.LR)
