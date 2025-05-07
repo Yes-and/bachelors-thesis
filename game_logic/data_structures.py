@@ -1,15 +1,18 @@
 class GameExperienceMemory:
     def __init__(self):
-        self.state = None
-        self.action = None
-        self.turn = None
+        self.states = []
+        self.actions = []
+        self.intermediate_rewards = []
         self.end_turns = None
         self.end_reward = None
 
-    def store(self, state, action, turn, end_turns, end_reward):
-        """Store a single transition."""
+class SingleExperienceMemory:
+    def __init__(self, state, action, reward, turn, end_turns, intermediate_reward=None, next_state=None, done=False):
         self.state = state
         self.action = action
+        self.reward = reward
         self.turn = turn
         self.end_turns = end_turns
-        self.end_reward = end_reward
+        self.intermediate_reward = intermediate_reward
+        self.next_state = next_state
+        self.done = done
