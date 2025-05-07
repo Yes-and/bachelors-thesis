@@ -12,7 +12,8 @@ from pyminion.expansions.base import (
 )
 from pyminion.core import Card
 
-# Cards selected according to rulebook: https://wiki.dominionstrategy.com/images/c/c5/DominionRulebook2016.pdf
+# Cards selected according to rulebook: 
+# https://wiki.dominionstrategy.com/images/c/c5/DominionRulebook2016.pdf
 custom_set: list[Card] = [
     cellar,
     market,

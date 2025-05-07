@@ -13,23 +13,24 @@ class CustomGame(Game):
     """
     Modified version of the game class.
 
-    This version makes it easier to collect important information.
+    This version makes it easier to collect important information
+    and pass the game memory to the bot used by the agent.
     """
     def __init__(
         self,
         players: list[Player],
         expansions: list[list[Card]],
-        log_stdout: bool
+        log_stdout: bool,
+        memory: GameExperienceMemory
     ):
         super().__init__(
             players=players,
             expansions=expansions,
             log_stdout=log_stdout
         )
-        self.exp_buffer = GameExperienceMemory()
-        self.player_vp = 0
-        self.enemy_vp = 0
-        self.player_turns = 0
+        self.memory = memory
+        self.player_vp = None
+        self.enemy_vp = None
         self.max_turns = 50
 
     def play(self) -> GameResult:
@@ -43,55 +44,30 @@ class CustomGame(Game):
                     # Summarize the game for debugging
                     result = self.summarize_game()
                     logging.info(f"\n{result}")
-                    
-                    # Get reward
-                    i = [str(player) for player in self.players].index('my_bot')
-                    self.player_vp = self.players[i].get_victory_points()
-                    self.enemy_vp = self.players[1-i].get_victory_points()
-                    self.player_turns = self.players[i].turns
-                    
-                    # We don't want the agent to play long games
-                    reward = -1
 
-                    # Save reward to last experience
-                    self.exp_buffer.rewards[-1] = reward
+                    # Add negative reward for stretching the game
+                    self.memory.end_turns = 50
+                    self.memory.end_reward = -1
 
                     return result
-                    
                 
                 if (self.is_over()):
                     # Summarize the game for debugging
                     result = self.summarize_game()
                     logging.info(f"\n{result}")
 
-                    # Get reward
+                    # Calculate the end reward
                     i = [str(player) for player in self.players].index('my_bot')
                     self.player_vp = self.players[i].get_victory_points()
                     self.enemy_vp = self.players[1-i].get_victory_points()
-                    self.player_turns = self.players[i].turns
-                    reward = 5 if (self.player_vp>self.enemy_vp) else -5
+                    
+                    good_cards_ratio = self.players[i].get_good_cards_ratio()
+                    end_reward = (self.player_vp - self.enemy_vp) / 50 + good_cards_ratio 
+                    # TODO: add more complex reward structure
 
-                    # Save reward to last experience
-                    self.exp_buffer.rewards[-1] = reward
+                    self.memory.end_turns = self.players[i].turns
+                    self.memory.end_reward = end_reward
 
                     return result
 
                 self.play_turn(player)
-
-                if player.player_id == 'my_bot':
-                    state = player.state_before_action
-                    action = player.decider.action
-                    state_value = player.decider.state_value
-                    log_prob = player.decider.log_prob
-                    reward = player.decider.reward
-                    done = False
-
-                    # Save experiences to exp buffer
-                    self.exp_buffer.store(
-                        state=state,
-                        action=action,
-                        state_value=state_value,
-                        log_prob=log_prob,
-                        reward=reward,
-                        done=done
-                    )
