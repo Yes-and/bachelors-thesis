@@ -1,4 +1,3 @@
-import random
 from typing import Iterator
 
 import numpy as np
@@ -34,8 +33,8 @@ class MyBot(OptimizedBot):
     def __init__(
         self,
         net,
-        prob_action,
         memory,
+        g,
         player_id: str = "my_bot"
     ):
         super().__init__(
@@ -43,8 +42,8 @@ class MyBot(OptimizedBot):
             player_id=player_id
             )
         self.net = net
-        self.prob_action = prob_action
         self.memory = memory
+        self.g = g
 
     def take_turn(self, game: "Game", is_extra_turn: bool = False) -> None:
         self.start_turn(game, is_extra_turn)
@@ -57,13 +56,17 @@ class MyBot(OptimizedBot):
         self.start_buy_phase(game)
         self.decider.reset_state() # Reset the state for debugging
 
+        # Set intermediate reward
+        self.memory.intermediate_rewards.append(0) # TODO: implement intermediate reward calculation
+
         self.start_cleanup_phase(game)
         self.end_turn(game)
 
-    def get_good_cards_ratio(self, game: "Game") -> float:
+    def get_good_cards_ratio(self):
         all_cards = [card for card in self.get_all_cards()]
-        non_trash_cards = [card for card in all_cards if card not in [curse, copper, estate]]
-        return len(non_trash_cards) / len(all_cards)
+        good_cards = [card for card in all_cards if card not in [curse, copper, estate]] # These are judged as low value cards by the author
+        ratio = len(good_cards) / len(all_cards)
+        return ratio
 
 class MyBotDecider(OptimizedBotDecider):
     def __init__(
@@ -73,7 +76,6 @@ class MyBotDecider(OptimizedBotDecider):
         self.state = None
         self.action = None
         self.turn = None
-        self.state_indexes = {}
         self.action_mapping = {
             1: estate,
             2: duchy,
@@ -116,17 +118,7 @@ class MyBotDecider(OptimizedBotDecider):
         complete_state = list(pile_cards.values()) + \
             list(player_cards.values())
         normalized_state = np.array(complete_state) / np.array(divs)
-        self.state = normalized_state
-
-        state_indexes = ['pile_' + val for val in list(pile_cards.keys())] + \
-            ['player_money', 'player_discard_size'] + \
-            ['player_' + val for val in list(player_cards.keys())] + \
-            ['enemy_money', 'enemy_VPs']
-        if not self.state_indexes:
-            self.state_indexes = state_indexes
-        else:
-            if not (self.state_indexes==state_indexes):
-                raise Exception('The order of cards in the state has changed!')
+        self.state = normalized_state # Set the state as object variable
 
     def reset_state(self):
         """
@@ -136,15 +128,13 @@ class MyBotDecider(OptimizedBotDecider):
 
     def action_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
         """
-        Currently no action are used for simplification.
+        Define action priority for the decider used by the bot.
+        It is currently as follows:
+        1. Cards that give more actions are used
+        2. Cards that upgrade low-value cards are used
+        3. Cards that allow the player to draw more cards are used last
+        Note: Remodel isn't used because it is complex.
         """
-        # """
-        # The action priority is dictated by a simple heuristic:
-        # 1. Use cards that give actions
-        # 2. Use cards that give a large advantage
-        # 3. Use cards that give more cards
-        # 4. Use all other cards
-        # """
         while (player.state.actions > 0):
             available_cards = [
                 pile.cards[0] for pile in game.supply.piles if len(pile.cards)>0
@@ -165,7 +155,7 @@ class MyBotDecider(OptimizedBotDecider):
                 ) or (
                     curse in player.hand.cards
                 )
-            ): # The bot will discard victory cards
+            ): # The bot will discard victory cards which can't be used
                 yield cellar
             elif (mine in player.hand.cards) and (
                 (
@@ -215,28 +205,22 @@ class MyBotDecider(OptimizedBotDecider):
             elif len(game.supply.piles[i].cards)==0:
                 valid_actions[i] = 0
 
-        if (not self.turn) and (random.random() < player.prob_action):
-            valid_actions = [i for i in range(17) if valid_actions[i]==1] # Convert to a numerical list
-            self.action = random.choice(valid_actions)
-            self.turn = player.turns
+        # Convert game state to tensor
+        state_tensor = torch.tensor(
+            self.state,
+            dtype=torch.float32
+        ).unsqueeze(0)
 
-            # Save important variables
-            player.memory.state = self.state
-            player.memory.action = self.action
-            player.memory.turn = self.turn
-        else:
-            # Get the game state
-            state_tensor = torch.tensor(
-                self.state,
-                dtype=torch.float32
-            ).unsqueeze(0)
+        # Get valid action mask (1 for valid, 0 for invalid)
+        valid_action_mask = torch.tensor([valid_actions])
 
-            # Get valid action mask (1 for valid, 0 for invalid)
-            valid_action_mask = torch.tensor([valid_actions])
+        # Obtain a decision by the network
+        action, _ = player.net.get_action(state_tensor, player.g, valid_action_mask)
 
-            action, log_prob, probs = player.net.get_action(state_tensor, valid_action_mask)
-            
-            self.action = action
+        # Set and save the selected action
+        self.action = action
+        player.memory.states.append(self.state)
+        player.memory.actions.append(self.action)
 
         # Set return card
         card = self.action_mapping[self.action+1]
