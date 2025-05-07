@@ -1,6 +1,6 @@
 import copy
 
-from src.network_model import PolicyNetwork
+from src.networks import A2C
 from game_logic.data_structures import GameExperienceMemory
 from game_logic.game import CustomGame
 from game_logic.bots.my_bot import MyBot
@@ -19,25 +19,25 @@ class GlobalVariables:
     ACTION_SIZE = 18
 
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    MODEL_PATH = "./models/the_best_model_so_far.pth"
+    MODEL_PATH = "./models/A2C-model-2025-05-07 14-29-27.pth"
 
 g = GlobalVariables()
 
-policy_net = PolicyNetwork(g.STATE_SIZE, g.ACTION_SIZE).to(g.DEVICE)
-policy_net.load_state_dict(torch.load(g.MODEL_PATH, map_location=g.DEVICE)) # Load the network
-policy_net.eval() # Sets network to evaluation mode
+shared_net = A2C(g.STATE_SIZE, g.ACTION_SIZE).to(g.DEVICE)
+shared_net.load_state_dict(torch.load(g.MODEL_PATH, map_location=g.DEVICE)) # Load the network
+shared_net.eval() # Sets network to evaluation mode
 
 memory = GameExperienceMemory()
 
 # Set up the game
 bot1 = BigMoney()
-bot2 = MyBot(net=policy_net, prob_action=0, memory=memory)
+bot2 = MyBot(net=shared_net, memory=memory, g=g)
 game = CustomGame(
     players=[bot1, bot2],
     expansions=[custom_set],
     log_stdout=False,
     memory=memory
 )
-sim = Simulator(game, iterations=100)
+sim = Simulator(game, iterations=1000)
 result = sim.run()
 print(result)
