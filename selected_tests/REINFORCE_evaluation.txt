@@ -1,0 +1,1022 @@
+Starting Game...
+
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse   
+(46)  $0 Copper    (40)  $3 Silver    (30)  $6 Gold    
+(10)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine    
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant  (10)  $3 Village   (10)  $3 Workshop
+
+
+big_money starts with 7 Copper, 3 Estate
+big_money shuffles their deck
+big_money draws 2 Copper, 3 Estate
+
+my_bot starts with 7 Copper, 3 Estate
+my_bot shuffles their deck
+my_bot draws 4 Copper, 1 Estate
+
+Turn 1 - big_money
+big_money's hand: 2 Copper, 3 Estate
+Hand: 2 Copper, 3 Estate
+big_money played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse   
+(46)  $0 Copper    (40)  $3 Silver    (30)  $6 Gold    
+(10)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine    
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant  (10)  $3 Village   (10)  $3 Workshop
+
+Money: 2
+Buys: 1
+big_money buys nothing
+big_money draws 5 Copper
+
+Turn 1 - my_bot
+my_bot's hand: 4 Copper, 1 Estate
+Hand: 4 Copper, 1 Estate
+my_bot played Copper, Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse   
+(46)  $0 Copper    (40)  $3 Silver    (30)  $6 Gold    
+(10)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine    
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant  (10)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+my_bot buys Militia
+my_bot draws 3 Copper, 2 Estate
+
+Turn 2 - big_money
+big_money's hand: 5 Copper
+Hand: 5 Copper
+big_money played Copper, Copper, Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (40)  $3 Silver    (30)  $6 Gold
+ (9)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant  (10)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+big_money buys Silver
+big_money shuffles their deck
+big_money draws 4 Copper, 1 Silver
+
+Turn 2 - my_bot
+my_bot's hand: 3 Copper, 2 Estate
+Hand: 3 Copper, 2 Estate
+my_bot played Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (39)  $3 Silver    (30)  $6 Gold
+ (9)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant  (10)  $3 Village   (10)  $3 Workshop
+
+Money: 3
+Buys: 1
+my_bot buys Village
+my_bot shuffles their deck
+my_bot draws 3 Copper, 1 Militia, 1 Estate
+
+Turn 3 - big_money
+big_money's hand: 4 Copper, 1 Silver
+Hand: 4 Copper, 1 Silver
+big_money played Copper, Copper, Copper, Copper, Silver
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (39)  $3 Silver    (30)  $6 Gold
+ (9)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (9)  $3 Village   (10)  $3 Workshop
+
+Money: 6
+Buys: 1
+big_money buys Gold
+big_money draws 2 Copper, 3 Estate
+
+Turn 3 - my_bot
+my_bot's hand: 3 Copper, 1 Militia, 1 Estate
+my_bot plays Militia
+big_money discards Copper
+big_money discards Copper
+Hand: 3 Copper, 1 Estate
+my_bot played Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (39)  $3 Silver    (29)  $6 Gold
+ (9)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (9)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+my_bot buys Militia
+my_bot draws 3 Copper, 1 Estate, 1 Village
+
+Turn 4 - big_money
+big_money's hand: 3 Estate
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (39)  $3 Silver    (29)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (9)  $3 Village   (10)  $3 Workshop
+
+Money: 0
+Buys: 1
+big_money buys nothing
+big_money shuffles their deck
+big_money draws 4 Copper, 1 Estate
+
+Turn 4 - my_bot
+my_bot's hand: 3 Copper, 1 Estate, 1 Village
+my_bot plays Village
+my_bot draws 1 Estate
+my_bot's hand: 3 Copper, 2 Estate
+Hand: 3 Copper, 2 Estate
+my_bot played Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (39)  $3 Silver    (29)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (9)  $3 Village   (10)  $3 Workshop
+
+Money: 3
+Buys: 1
+my_bot buys Village
+my_bot shuffles their deck
+my_bot draws 4 Copper, 1 Militia
+
+Turn 5 - big_money
+big_money's hand: 4 Copper, 1 Estate
+Hand: 4 Copper, 1 Estate
+big_money played Copper, Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (39)  $3 Silver    (29)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (8)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+big_money buys Silver
+big_money draws 1 Silver, 2 Estate, 2 Copper
+
+Turn 5 - my_bot
+my_bot's hand: 4 Copper, 1 Militia
+my_bot plays Militia
+big_money discards Silver
+big_money discards Estate
+Hand: 4 Copper
+my_bot played Copper, Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (38)  $3 Silver    (29)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (8)  $3 Village   (10)  $3 Workshop
+
+Money: 6
+Buys: 1
+my_bot buys Gold
+my_bot draws 1 Estate, 3 Copper, 1 Village
+
+Turn 6 - big_money
+big_money's hand: 2 Copper, 1 Estate
+Hand: 2 Copper, 1 Estate
+big_money played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (38)  $3 Silver    (28)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (8)  $3 Village   (10)  $3 Workshop
+
+Money: 2
+Buys: 1
+big_money buys nothing
+big_money shuffles their deck
+big_money draws 1 Gold, 2 Copper, 2 Estate
+
+Turn 6 - my_bot
+my_bot's hand: 1 Estate, 3 Copper, 1 Village
+my_bot plays Village
+my_bot draws 1 Estate
+my_bot's hand: 2 Estate, 3 Copper
+Hand: 2 Estate, 3 Copper
+my_bot played Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (38)  $3 Silver    (28)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (8)  $3 Village   (10)  $3 Workshop
+
+Money: 3
+Buys: 1
+my_bot buys Village
+my_bot shuffles their deck
+my_bot draws 2 Village, 2 Militia, 1 Estate
+
+Turn 7 - big_money
+big_money's hand: 1 Gold, 2 Copper, 2 Estate
+Hand: 1 Gold, 2 Copper, 2 Estate
+big_money played Gold, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (38)  $3 Silver    (28)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (7)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+big_money buys Silver
+big_money draws 4 Copper, 1 Silver
+
+Turn 7 - my_bot
+my_bot's hand: 2 Village, 2 Militia, 1 Estate
+my_bot plays Village
+my_bot draws 1 Copper
+my_bot's hand: 2 Militia, 1 Estate, 1 Village, 1 Copper
+my_bot plays Village
+my_bot draws 1 Copper
+my_bot's hand: 2 Militia, 1 Estate, 2 Copper
+my_bot plays Militia
+big_money discards Copper
+big_money discards Copper
+my_bot's hand: 1 Estate, 1 Militia, 2 Copper
+my_bot plays Militia
+my_bot's hand: 1 Estate, 2 Copper
+Hand: 1 Estate, 2 Copper
+my_bot played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (37)  $3 Silver    (28)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (7)  $3 Village   (10)  $3 Workshop
+
+Money: 6
+Buys: 1
+my_bot buys Gold
+my_bot draws 2 Copper, 1 Village, 2 Estate
+
+Turn 8 - big_money
+big_money's hand: 2 Copper, 1 Silver
+Hand: 2 Copper, 1 Silver
+big_money played Copper, Copper, Silver
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (37)  $3 Silver    (27)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (7)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+big_money buys Silver
+big_money shuffles their deck
+big_money draws 2 Silver, 2 Copper, 1 Estate
+
+Turn 8 - my_bot
+my_bot's hand: 2 Copper, 1 Village, 2 Estate
+my_bot plays Village
+my_bot draws 1 Copper
+my_bot's hand: 3 Copper, 2 Estate
+Hand: 3 Copper, 2 Estate
+my_bot played Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (36)  $3 Silver    (27)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (7)  $3 Village   (10)  $3 Workshop
+
+Money: 3
+Buys: 1
+my_bot buys Village
+my_bot shuffles their deck
+my_bot draws 1 Gold, 3 Copper, 1 Militia
+
+Turn 9 - big_money
+big_money's hand: 2 Silver, 2 Copper, 1 Estate
+Hand: 2 Silver, 2 Copper, 1 Estate
+big_money played Silver, Copper, Copper, Silver
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (36)  $3 Silver    (27)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 6
+Buys: 1
+big_money buys Gold
+big_money draws 2 Silver, 3 Copper
+
+Turn 9 - my_bot
+my_bot's hand: 1 Gold, 3 Copper, 1 Militia
+my_bot plays Militia
+big_money discards Silver
+big_money discards Copper
+Hand: 1 Gold, 3 Copper
+my_bot played Gold, Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (8)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (36)  $3 Silver    (26)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 8
+Buys: 1
+my_bot buys Province
+my_bot draws 2 Copper, 1 Estate, 1 Village, 1 Militia
+
+Turn 10 - big_money
+big_money's hand: 1 Silver, 2 Copper
+Hand: 1 Silver, 2 Copper
+big_money played Silver, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (36)  $3 Silver    (26)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+big_money buys Silver
+big_money draws 2 Copper, 2 Estate, 1 Gold
+
+Turn 10 - my_bot
+my_bot's hand: 2 Copper, 1 Estate, 1 Village, 1 Militia
+my_bot plays Village
+my_bot draws 1 Village
+my_bot's hand: 2 Copper, 1 Estate, 1 Militia, 1 Village
+my_bot plays Village
+my_bot draws 1 Estate
+my_bot's hand: 2 Copper, 2 Estate, 1 Militia
+my_bot plays Militia
+big_money discards Copper
+big_money discards Estate
+my_bot's hand: 2 Copper, 2 Estate
+Hand: 2 Copper, 2 Estate
+my_bot played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (35)  $3 Silver    (26)  $6 Gold
+ (8)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+my_bot buys Militia
+my_bot draws 1 Village, 1 Gold, 2 Copper, 1 Estate
+
+Turn 11 - big_money
+big_money's hand: 1 Copper, 1 Estate, 1 Gold
+Hand: 1 Copper, 1 Estate, 1 Gold
+big_money played Copper, Gold
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (35)  $3 Silver    (26)  $6 Gold
+ (7)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+big_money buys Silver
+big_money shuffles their deck
+big_money draws 4 Silver, 1 Copper
+
+Turn 11 - my_bot
+my_bot's hand: 1 Village, 1 Gold, 2 Copper, 1 Estate
+my_bot plays Village
+my_bot draws 1 Village
+my_bot's hand: 1 Gold, 2 Copper, 1 Estate, 1 Village
+my_bot plays Village
+my_bot shuffles their deck
+my_bot draws 1 Militia
+my_bot's hand: 1 Gold, 2 Copper, 1 Estate, 1 Militia
+my_bot plays Militia
+big_money discards Silver
+big_money discards Copper
+my_bot's hand: 1 Gold, 2 Copper, 1 Estate
+Hand: 1 Gold, 2 Copper, 1 Estate
+my_bot played Gold, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (34)  $3 Silver    (26)  $6 Gold
+ (7)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 7
+Buys: 1
+my_bot buys Gold
+my_bot draws 1 Village, 2 Copper, 1 Estate, 1 Province
+
+Turn 12 - big_money
+big_money's hand: 3 Silver
+Hand: 3 Silver
+big_money played Silver, Silver, Silver
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (34)  $3 Silver    (25)  $6 Gold
+ (7)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 6
+Buys: 1
+big_money buys Gold
+big_money draws 1 Gold, 2 Estate, 2 Copper
+
+Turn 12 - my_bot
+my_bot's hand: 1 Village, 2 Copper, 1 Estate, 1 Province
+my_bot plays Village
+my_bot draws 1 Village
+my_bot's hand: 2 Copper, 1 Estate, 1 Province, 1 Village
+my_bot plays Village
+my_bot draws 1 Militia
+my_bot's hand: 2 Copper, 1 Estate, 1 Province, 1 Militia
+my_bot plays Militia
+big_money discards Gold
+big_money discards Estate
+my_bot's hand: 2 Copper, 1 Estate, 1 Province
+Hand: 2 Copper, 1 Estate, 1 Province
+my_bot played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (34)  $3 Silver    (24)  $6 Gold
+ (7)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+my_bot buys Militia
+my_bot draws 1 Militia, 3 Copper, 1 Gold
+
+Turn 13 - big_money
+big_money's hand: 1 Estate, 2 Copper
+Hand: 1 Estate, 2 Copper
+big_money played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (34)  $3 Silver    (24)  $6 Gold
+ (6)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 2
+Buys: 1
+big_money buys nothing
+big_money draws 1 Estate, 1 Gold, 2 Copper, 1 Silver
+
+Turn 13 - my_bot
+my_bot's hand: 1 Militia, 3 Copper, 1 Gold
+my_bot plays Militia
+big_money discards Estate
+big_money discards Gold
+Hand: 3 Copper, 1 Gold
+my_bot played Copper, Gold, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (7)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (34)  $3 Silver    (24)  $6 Gold
+ (6)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 8
+Buys: 1
+my_bot buys Province
+my_bot shuffles their deck
+my_bot draws 2 Estate, 1 Militia, 1 Village, 1 Copper
+
+Turn 14 - big_money
+big_money's hand: 2 Copper, 1 Silver
+Hand: 2 Copper, 1 Silver
+big_money played Copper, Silver, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (6)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (34)  $3 Silver    (24)  $6 Gold
+ (6)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+big_money buys Silver
+big_money shuffles their deck
+big_money draws 3 Copper, 1 Silver, 1 Estate
+
+Turn 14 - my_bot
+my_bot's hand: 2 Estate, 1 Militia, 1 Village, 1 Copper
+my_bot plays Village
+my_bot draws 1 Village
+my_bot's hand: 2 Estate, 1 Militia, 1 Copper, 1 Village
+my_bot plays Village
+my_bot draws 1 Copper
+my_bot's hand: 2 Estate, 1 Militia, 2 Copper
+my_bot plays Militia
+big_money discards Copper
+big_money discards Copper
+my_bot's hand: 2 Estate, 2 Copper
+Hand: 2 Estate, 2 Copper
+my_bot played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (6)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (33)  $3 Silver    (24)  $6 Gold
+ (6)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+my_bot buys Militia
+my_bot draws 1 Province, 4 Copper
+
+Turn 15 - big_money
+big_money's hand: 1 Silver, 1 Estate, 1 Copper
+Hand: 1 Silver, 1 Estate, 1 Copper
+big_money played Silver, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (6)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (33)  $3 Silver    (24)  $6 Gold
+ (5)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 3
+Buys: 1
+big_money buys Silver
+big_money draws 1 Gold, 1 Estate, 2 Silver, 1 Copper
+
+Turn 15 - my_bot
+my_bot's hand: 1 Province, 4 Copper
+Hand: 1 Province, 4 Copper
+my_bot played Copper, Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (6)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (32)  $3 Silver    (24)  $6 Gold
+ (5)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+my_bot buys Militia
+my_bot draws 1 Province, 3 Gold, 1 Militia
+
+Turn 16 - big_money
+big_money's hand: 1 Gold, 1 Estate, 2 Silver, 1 Copper
+Hand: 1 Gold, 1 Estate, 2 Silver, 1 Copper
+big_money played Gold, Silver, Silver, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (6)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (32)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 8
+Buys: 1
+big_money buys Province
+big_money draws 3 Silver, 2 Copper
+
+Turn 16 - my_bot
+my_bot's hand: 1 Province, 3 Gold, 1 Militia
+my_bot plays Militia
+big_money discards Silver
+big_money discards Silver
+Hand: 1 Province, 3 Gold
+my_bot played Gold, Gold, Gold
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (5)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (32)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 11
+Buys: 1
+my_bot buys Province
+my_bot draws 2 Militia, 1 Copper, 2 Village
+
+Turn 17 - big_money
+big_money's hand: 2 Copper, 1 Silver
+Hand: 2 Copper, 1 Silver
+big_money played Copper, Copper, Silver
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (4)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (32)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+big_money buys Silver
+big_money draws 1 Copper, 2 Gold, 1 Estate, 1 Silver
+
+Turn 17 - my_bot
+my_bot's hand: 2 Militia, 1 Copper, 2 Village
+my_bot plays Village
+my_bot draws 1 Estate
+my_bot's hand: 2 Militia, 1 Copper, 1 Village, 1 Estate
+my_bot plays Village
+my_bot shuffles their deck
+my_bot draws 1 Gold
+my_bot's hand: 2 Militia, 1 Copper, 1 Estate, 1 Gold
+my_bot plays Militia
+big_money discards Copper
+big_money discards Gold
+my_bot's hand: 1 Militia, 1 Copper, 1 Estate, 1 Gold
+my_bot plays Militia
+my_bot's hand: 1 Copper, 1 Estate, 1 Gold
+Hand: 1 Copper, 1 Estate, 1 Gold
+my_bot played Copper, Gold
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (4)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (31)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 8
+Buys: 1
+my_bot buys Province
+my_bot draws 3 Copper, 1 Province, 1 Estate
+
+Turn 18 - big_money
+big_money's hand: 1 Estate, 1 Gold, 1 Silver
+Hand: 1 Estate, 1 Gold, 1 Silver
+big_money played Gold, Silver
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (3)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (31)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+big_money buys Silver
+big_money shuffles their deck
+big_money draws 2 Copper, 2 Gold, 1 Silver
+
+Turn 18 - my_bot
+my_bot's hand: 3 Copper, 1 Province, 1 Estate
+Hand: 3 Copper, 1 Province, 1 Estate
+my_bot played Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (3)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (30)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (6)  $3 Village   (10)  $3 Workshop
+
+Money: 3
+Buys: 1
+my_bot buys Village
+my_bot draws 1 Militia, 3 Copper, 1 Estate
+
+Turn 19 - big_money
+big_money's hand: 2 Copper, 2 Gold, 1 Silver
+Hand: 2 Copper, 2 Gold, 1 Silver
+big_money played Copper, Gold, Copper, Gold, Silver
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (3)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (30)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 10
+Buys: 1
+big_money buys Province
+big_money draws 2 Copper, 3 Silver
+
+Turn 19 - my_bot
+my_bot's hand: 1 Militia, 3 Copper, 1 Estate
+my_bot plays Militia
+big_money discards Copper
+big_money discards Silver
+Hand: 3 Copper, 1 Estate
+my_bot played Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (8)  $5 Duchy      (2)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (30)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+my_bot buys Duchy
+my_bot draws 1 Province, 1 Village, 1 Gold, 2 Militia
+
+Turn 20 - big_money
+big_money's hand: 2 Silver, 1 Copper
+Hand: 2 Silver, 1 Copper
+big_money played Silver, Copper, Silver
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (2)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (30)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+big_money buys Silver
+big_money draws 2 Copper, 1 Silver, 1 Estate, 1 Province
+
+Turn 20 - my_bot
+my_bot's hand: 1 Province, 1 Village, 1 Gold, 2 Militia
+my_bot plays Village
+my_bot draws 1 Province
+my_bot's hand: 2 Province, 1 Gold, 2 Militia
+my_bot plays Militia
+big_money discards Copper
+big_money discards Silver
+my_bot's hand: 2 Province, 1 Gold, 1 Militia
+my_bot plays Militia
+Hand: 2 Province, 1 Gold
+my_bot played Gold
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (2)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (24)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 7
+Buys: 1
+my_bot buys Gold
+my_bot shuffles their deck
+my_bot draws 2 Gold, 2 Militia, 1 Village
+
+Turn 21 - big_money
+big_money's hand: 1 Estate, 1 Province, 1 Copper
+Hand: 1 Estate, 1 Province, 1 Copper
+big_money played Copper
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (2)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (23)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 1
+Buys: 1
+big_money buys nothing
+big_money draws 1 Copper, 3 Silver, 1 Gold
+
+Turn 21 - my_bot
+my_bot's hand: 2 Gold, 2 Militia, 1 Village
+my_bot plays Village
+my_bot draws 1 Province
+my_bot's hand: 2 Gold, 2 Militia, 1 Province
+my_bot plays Militia
+big_money discards Copper
+big_money discards Silver
+my_bot's hand: 2 Gold, 1 Militia, 1 Province
+my_bot plays Militia
+Hand: 2 Gold, 1 Province
+my_bot played Gold, Gold
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (2)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (23)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 10
+Buys: 1
+my_bot buys Province
+my_bot draws 1 Gold, 1 Estate, 2 Copper, 1 Village
+
+Turn 22 - big_money
+big_money's hand: 2 Silver, 1 Gold
+Hand: 2 Silver, 1 Gold
+big_money played Silver, Gold, Silver
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (23)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 7
+Buys: 1
+big_money buys Gold
+big_money shuffles their deck
+big_money draws 3 Silver, 2 Estate
+
+Turn 22 - my_bot
+my_bot's hand: 1 Gold, 1 Estate, 2 Copper, 1 Village
+my_bot plays Village
+my_bot draws 1 Copper
+my_bot's hand: 1 Gold, 1 Estate, 3 Copper
+Hand: 1 Gold, 1 Estate, 3 Copper
+my_bot played Gold, Copper, Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (22)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 6
+Buys: 1
+my_bot buys Gold
+my_bot draws 1 Province, 1 Duchy, 1 Estate, 2 Militia
+
+Turn 23 - big_money
+big_money's hand: 3 Silver, 2 Estate
+Hand: 3 Silver, 2 Estate
+big_money played Silver, Silver, Silver
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (21)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 6
+Buys: 1
+big_money buys Gold
+big_money draws 1 Province, 1 Gold, 2 Silver, 1 Copper
+
+Turn 23 - my_bot
+my_bot's hand: 1 Province, 1 Duchy, 1 Estate, 2 Militia
+my_bot plays Militia
+big_money discards Province
+big_money discards Gold
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (20)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+(10)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 2
+Buys: 1
+my_bot buys Cellar
+my_bot draws 1 Village, 1 Militia, 1 Estate, 1 Copper, 1 Province
+
+Turn 24 - big_money
+big_money's hand: 2 Silver, 1 Copper
+Hand: 2 Silver, 1 Copper
+big_money played Silver, Silver, Copper
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (29)  $3 Silver    (20)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+ (9)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+big_money buys Silver
+big_money draws 2 Gold, 2 Silver, 1 Province
+
+Turn 24 - my_bot
+my_bot's hand: 1 Village, 1 Militia, 1 Estate, 1 Copper, 1 Province
+my_bot plays Village
+my_bot draws 1 Village
+my_bot's hand: 1 Militia, 1 Estate, 1 Copper, 1 Province, 1 Village
+my_bot plays Village
+my_bot draws 1 Village
+my_bot's hand: 1 Militia, 1 Estate, 1 Copper, 1 Province, 1 Village
+my_bot plays Village
+my_bot draws 1 Copper
+my_bot's hand: 1 Militia, 1 Estate, 2 Copper, 1 Province
+my_bot plays Militia
+big_money discards Gold
+big_money discards Silver
+my_bot's hand: 1 Estate, 2 Copper, 1 Province
+Hand: 1 Estate, 2 Copper, 1 Province
+my_bot played Copper, Copper
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (28)  $3 Silver    (20)  $6 Gold
+ (4)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+ (9)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 4
+Buys: 1
+my_bot buys Militia
+my_bot draws 2 Copper, 1 Gold, 1 Province, 1 Militia
+
+Turn 25 - big_money
+big_money's hand: 1 Province, 1 Gold, 1 Silver
+Hand: 1 Province, 1 Gold, 1 Silver
+big_money played Gold, Silver
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (28)  $3 Silver    (20)  $6 Gold
+ (3)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+ (9)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 5
+Buys: 1
+big_money buys Silver
+big_money draws 3 Copper, 1 Silver, 1 Estate
+
+Turn 25 - my_bot
+my_bot's hand: 2 Copper, 1 Gold, 1 Province, 1 Militia
+my_bot plays Militia
+big_money discards Copper
+big_money discards Copper
+Hand: 2 Copper, 1 Gold, 1 Province
+my_bot played Copper, Copper, Gold
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (27)  $3 Silver    (20)  $6 Gold
+ (3)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+ (9)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 7
+Buys: 1
+my_bot buys Gold
+my_bot shuffles their deck
+my_bot draws 2 Copper, 2 Gold, 1 Province
+
+Turn 26 - big_money
+big_money's hand: 1 Copper, 1 Silver, 1 Estate
+Hand: 1 Copper, 1 Silver, 1 Estate
+big_money played Copper, Silver
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (27)  $3 Silver    (19)  $6 Gold
+ (3)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+ (9)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 3
+Buys: 1
+big_money buys Silver
+big_money draws 2 Silver, 1 Gold, 2 Copper
+
+Turn 26 - my_bot
+my_bot's hand: 2 Copper, 2 Gold, 1 Province
+Hand: 2 Copper, 2 Gold, 1 Province
+my_bot played Copper, Gold, Gold, Copper
+
+Supply:
+ (8)  $2 Estate     (7)  $5 Duchy      (1)  $8 Province  (10)  $0 Curse
+(46)  $0 Copper    (26)  $3 Silver    (19)  $6 Gold
+ (3)  $4 Militia   (10)  $4 Remodel   (10)  $4 Smithy    (10)  $5 Market    (10)  $5 Mine
+ (9)  $2 Cellar    (10)  $2 Moat      (10)  $3 Merchant   (5)  $3 Village   (10)  $3 Workshop
+
+Money: 8
+Buys: 1
+my_bot buys Province
+my_bot draws 2 Province, 1 Village, 1 Gold, 1 Militia
+
+Game Result: my_bot won in 26 turns
+Player: big_money
+Result: loss
+Score: 15
+Turns: 26
+Shuffles: 9
+Turn Order: 1st
+Deck: 14 Silver, 7 Copper, 5 Gold, 3 Estate, 2 Province
+Player: my_bot
+Result: win
+Score: 42
+Turns: 26
+Shuffles: 10
+Turn Order: 2nd
+Deck: 7 Militia, 6 Gold, 7 Copper, 5 Village, 1 Cellar, 3 Estate, 1 Duchy, 6 Province
+Game Result: my_bot won in 26 turns
+Player: big_money
+Result: loss
+Score: 15
+Turns: 26
+Shuffles: 9
+Turn Order: 1st
+Deck: 14 Silver, 7 Copper, 5 Gold, 3 Estate, 2 Province
+Player: my_bot
+Result: win
+Score: 42
+Turns: 26
+Shuffles: 10
+Turn Order: 2nd
+Deck: 7 Militia, 6 Gold, 7 Copper, 5 Village, 1 Cellar, 3 Estate, 1 Duchy, 6 Province
