@@ -1,0 +1,11 @@
+Against Big Money
+
+Simulation Result: ran 1000 games
+big_money won 992, lost 6, tied 2
+my_bot won 6, lost 992, tied 2
+
+Against Smithy
+
+Simulation Result: ran 1000 games
+big_money_smithy won 876, lost 83, tied 41
+my_bot won 83, lost 876, tied 41
